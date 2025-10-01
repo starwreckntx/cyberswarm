@@ -1,0 +1,142 @@
+// Cybersecurity Agent Swarm Platform Database Schema
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/cybersecurity_dashboard/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Agent registration and status tracking
+model Agent {
+  id              String   @id @default(cuid())
+  agentId         String   @unique
+  agentName       String
+  agentType       String
+  supportedTasks  String[] // JSON array of supported task names
+  status          String   @default("IDLE") // IDLE, BUSY, ERROR, OFFLINE
+  lastSeen        DateTime @default(now())
+  registeredAt    DateTime @default(now())
+  
+  // Relations
+  tasks           Task[]
+  chainOfThoughts ChainOfThought[]
+  events          Event[]
+  
+  @@map("agents")
+}
+
+// Task assignment and execution tracking
+model Task {
+  id          String   @id @default(cuid())
+  taskId      String   @unique
+  agentType   String
+  taskName    String
+  target      String?
+  details     Json?    // Additional task parameters
+  status      String   @default("PENDING") // PENDING, ASSIGNED, EXECUTING, COMPLETED, FAILED
+  priority    Int      @default(1)
+  createdAt   DateTime @default(now())
+  assignedAt  DateTime?
+  completedAt DateTime?
+  
+  // Relations
+  agentId     String?
+  agent       Agent?   @relation(fields: [agentId], references: [agentId])
+  events      Event[]
+  chainOfThoughts ChainOfThought[]
+  
+  @@map("tasks")
+}
+
+// Cybersecurity events (RECON_DATA, VULNERABILITY_FOUND, etc.)
+model Event {
+  id          String   @id @default(cuid())
+  eventType   String   // RECON_DATA, VULNERABILITY_FOUND, INTRUSION_DETECTED, etc.
+  payload     Json     // Event data
+  severity    String?  // Critical, High, Medium, Low
+  target      String?  // Target IP or system
+  processed   Boolean  @default(false)
+  timestamp   DateTime @default(now())
+  
+  // Relations
+  agentId     String?
+  agent       Agent?   @relation(fields: [agentId], references: [agentId])
+  taskId      String?
+  task        Task?    @relation(fields: [taskId], references: [taskId])
+  
+  // Knowledge base categorization
+  category    String?  // recon, vulnerabilities, intrusions, defense_actions, adaptations
+  
+  @@map("events")
+}
+
+// Chain of thought reasoning for agent decisions
+model ChainOfThought {
+  id          String   @id @default(cuid())
+  stepNumber  Int      // Order of reasoning steps
+  stepType    String   // analysis, decision, action, evaluation
+  description String   // Human-readable description of the step
+  reasoning   String   // Detailed reasoning text
+  data        Json?    // Supporting data or context
+  confidence  Float?   // Confidence score (0-1)
+  timestamp   DateTime @default(now())
+  
+  // Relations
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [agentId])
+  taskId      String?
+  task        Task?    @relation(fields: [taskId], references: [taskId])
+  
+  @@map("chain_of_thoughts")
+}
+
+// Knowledge base for organized security findings
+model KnowledgeEntry {
+  id          String   @id @default(cuid())
+  category    String   // recon, vulnerabilities, intrusions, defense_actions, adaptations
+  title       String
+  description String
+  data        Json     // Structured data
+  severity    String?  // Critical, High, Medium, Low
+  tags        String[] // Searchable tags
+  source      String?  // Source agent or system
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("knowledge_entries")
+}
+
+// Logic Pipe execution tracking
+model LogicPipeExecution {
+  id              String   @id @default(cuid())
+  triggerEvent    String   // Event type that triggered the logic pipe
+  ruleApplied     String   // Which logic pipe rule was applied
+  inputData       Json     // Input event data
+  outputTasks     Json     // Generated tasks
+  executionTime   Int?     // Execution time in milliseconds
+  success         Boolean  @default(true)
+  errorMessage    String?
+  timestamp       DateTime @default(now())
+  
+  @@map("logic_pipe_executions")
+}
+
+// Agent interaction flow tracking
+model AgentInteraction {
+  id              String   @id @default(cuid())
+  interactionType String   // red_discovers_blue_reacts, blue_detects_red_adapts, blue_defends_red_reevaluates
+  sourceAgentId   String
+  targetAgentId   String?
+  triggerEvent    String
+  resultEvent     String?
+  flowCompleted   Boolean  @default(false)
+  duration        Int?     // Duration in seconds
+  timestamp       DateTime @default(now())
+  
+  @@map("agent_interactions")
+}
