@@ -1,0 +1,31 @@
+
+{
+  "indicators": [
+    {
+      "type": "ip",
+      "value": "192.168.1.100",
+      "description": "Known malicious IP",
+      "severity": "High",
+      "first_seen": "2024-01-01",
+      "tags": ["malware", "c2"]
+    }
+  ],
+  "campaigns": [
+    {
+      "name": "APT-SIM-001",
+      "description": "Simulated APT campaign for testing",
+      "tactics": ["reconnaissance", "initial-access", "persistence"],
+      "techniques": ["T1595", "T1190", "T1053"],
+      "severity": "High"
+    }
+  ],
+  "actors": [
+    {
+      "name": "THREAT-ACTOR-001",
+      "description": "Simulated threat actor",
+      "sophistication": "High",
+      "motivation": "Financial",
+      "ttps": ["phishing", "ransomware", "data-exfiltration"]
+    }
+  ]
+}
