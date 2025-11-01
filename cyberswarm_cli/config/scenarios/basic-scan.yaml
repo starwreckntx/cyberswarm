@@ -1,0 +1,17 @@
+
+# Basic Scan Scenario
+
+name: Basic Network Scan
+description: Simple network discovery and vulnerability scanning
+target: 192.168.1.0/24
+duration: 60000  # 60 seconds
+
+initialTasks:
+  - agentType: DiscoveryAgent
+    taskName: network_scan
+    priority: 10
+
+parameters:
+  scanDepth: basic
+  aggressiveness: low
+  stealthMode: true

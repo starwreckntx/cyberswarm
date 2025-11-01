@@ -1,0 +1,21 @@
+
+# Defensive Only Scenario
+
+name: Defensive Operations
+description: Blue team defensive operations and monitoring
+target: 192.168.1.0/24
+duration: 120000  # 2 minutes
+
+initialTasks:
+  - agentType: NetworkMonitorAgent
+    taskName: monitor_traffic
+    priority: 10
+  - agentType: PatchManagementAgent
+    taskName: config_harden
+    priority: 8
+
+parameters:
+  scanDepth: minimal
+  aggressiveness: defensive
+  stealthMode: true
+  focusDefense: true
