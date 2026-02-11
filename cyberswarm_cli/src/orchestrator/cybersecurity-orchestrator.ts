@@ -8,6 +8,10 @@ import { VulnerabilityScannerAgent } from '../agents/vulnerability-scanner-agent
 import { PatchManagementAgent } from '../agents/patch-management-agent.js';
 import { NetworkMonitorAgent } from '../agents/network-monitor-agent.js';
 import { StrategyAdaptationAgent } from '../agents/strategy-adaptation-agent.js';
+import { ThreatHunterAgent } from '../agents/threat-hunter-agent.js';
+import { IncidentResponseAgent } from '../agents/incident-response-agent.js';
+import { PostureAssessmentAgent } from '../agents/posture-assessment-agent.js';
+import { ThreatIntelligenceAgent } from '../agents/threat-intelligence-agent.js';
 import { CyberEvent, ChainOfThought, Task, SimulationState } from '../types.js';
 import { logger, logSimulationEvent } from '../utils/logger.js';
 import { Config } from '../types.js';
@@ -48,18 +52,28 @@ export class CyberSecurityOrchestrator {
    * Initialize all agents
    */
   private initializeAgents(): void {
-    // Create and register all 5 agents
+    // Create and register all 9 agents (5 original + 4 purple team)
     const discoveryAgent = new DiscoveryAgent(this.geminiClient);
     const vulnScannerAgent = new VulnerabilityScannerAgent(this.geminiClient);
     const patchMgmtAgent = new PatchManagementAgent(this.geminiClient);
     const networkMonitorAgent = new NetworkMonitorAgent(this.geminiClient);
     const strategyAdaptAgent = new StrategyAdaptationAgent(this.geminiClient);
 
+    // Purple Team Agents
+    const threatHunterAgent = new ThreatHunterAgent(this.geminiClient);
+    const incidentResponseAgent = new IncidentResponseAgent(this.geminiClient);
+    const postureAssessmentAgent = new PostureAssessmentAgent(this.geminiClient);
+    const threatIntelAgent = new ThreatIntelligenceAgent(this.geminiClient);
+
     this.agentManager.registerAgent(discoveryAgent);
     this.agentManager.registerAgent(vulnScannerAgent);
     this.agentManager.registerAgent(patchMgmtAgent);
     this.agentManager.registerAgent(networkMonitorAgent);
     this.agentManager.registerAgent(strategyAdaptAgent);
+    this.agentManager.registerAgent(threatHunterAgent);
+    this.agentManager.registerAgent(incidentResponseAgent);
+    this.agentManager.registerAgent(postureAssessmentAgent);
+    this.agentManager.registerAgent(threatIntelAgent);
 
     // Set up agent callbacks
     for (const agent of [
@@ -68,12 +82,16 @@ export class CyberSecurityOrchestrator {
       patchMgmtAgent,
       networkMonitorAgent,
       strategyAdaptAgent,
+      threatHunterAgent,
+      incidentResponseAgent,
+      postureAssessmentAgent,
+      threatIntelAgent,
     ]) {
       agent.setEventCallback(this.handleEvent.bind(this));
       agent.setChainOfThoughtCallback(this.handleChainOfThought.bind(this));
     }
 
-    logger.info('All agents initialized and registered');
+    logger.info('All agents initialized and registered (including purple team)');
   }
 
   /**

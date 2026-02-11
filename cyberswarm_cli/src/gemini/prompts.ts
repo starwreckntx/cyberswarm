@@ -233,6 +233,645 @@ Output a JSON object with this structure:
 }
 `,
 
+  // === Purple Team Prompts ===
+
+  // Threat Hunter Prompts
+  THREAT_HUNT_IOC: (target: string, context: any) => `
+You are a purple team threat hunter performing IOC-based threat hunting.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Your task is to:
+1. Formulate a threat hunting hypothesis based on available indicators
+2. Identify relevant data sources to query
+3. Search for indicators of compromise across the network
+4. Correlate findings with known threat intelligence
+5. Map findings to MITRE ATT&CK framework
+
+Output a JSON object with this structure:
+{
+  "hypothesis": "string describing the hunting hypothesis",
+  "indicators_checked": ["list of IOCs searched for"],
+  "data_sources": ["list of data sources queried"],
+  "findings": [
+    {
+      "type": "IOC_MATCH" | "BEHAVIORAL_ANOMALY" | "TTP_DETECTED" | "LATERAL_MOVEMENT" | "PERSISTENCE",
+      "description": "string describing the finding",
+      "severity": "Critical" | "High" | "Medium" | "Low",
+      "confidence": number (0-1),
+      "evidence": ["list of evidence items"],
+      "mitre_technique_id": "string (e.g., T1059.001)"
+    }
+  ],
+  "mitre_techniques": ["list of MITRE ATT&CK technique IDs"],
+  "confidence": number (0-1),
+  "recommendations": ["list of recommended next steps"]
+}
+
+Be thorough and realistic. Think like an experienced threat hunter.
+`,
+
+  THREAT_HUNT_TTP: (target: string, context: any) => `
+You are a purple team threat hunter performing TTP-based threat hunting using the MITRE ATT&CK framework.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Your task is to:
+1. Identify relevant MITRE ATT&CK techniques to hunt for
+2. Map observed activities to kill chain phases
+3. Detect technique chaining and attack progressions
+4. Identify potential lateral movement and persistence mechanisms
+
+Output a JSON object with this structure:
+{
+  "hypothesis": "string describing the TTP hunting hypothesis",
+  "techniques_analyzed": [
+    {
+      "technique_id": "string (e.g., T1059)",
+      "technique_name": "string",
+      "tactic": "string (e.g., Execution)",
+      "indicators_found": boolean,
+      "evidence": ["list of evidence"]
+    }
+  ],
+  "kill_chain_phases": ["list of observed kill chain phases"],
+  "attack_chain_detected": boolean,
+  "findings": [
+    {
+      "type": "TTP_DETECTED" | "LATERAL_MOVEMENT" | "PERSISTENCE",
+      "description": "string",
+      "severity": "Critical" | "High" | "Medium" | "Low",
+      "confidence": number (0-1),
+      "evidence": ["list of evidence items"],
+      "mitre_technique_id": "string"
+    }
+  ],
+  "indicators": ["list of indicators discovered"],
+  "data_sources": ["list of data sources used"],
+  "confidence": number (0-1),
+  "recommendations": ["list of recommended actions"]
+}
+`,
+
+  THREAT_HUNT_ANOMALY: (target: string, context: any) => `
+You are a purple team threat hunter performing anomaly-based threat hunting.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Your task is to:
+1. Establish behavioral baselines for network activity
+2. Identify statistical anomalies and deviations
+3. Classify anomalies as potential threats vs benign activity
+4. Correlate anomalies with known attack patterns
+
+Output a JSON object with this structure:
+{
+  "hypothesis": "string describing the anomaly hunting hypothesis",
+  "baselines": [
+    {
+      "metric": "string",
+      "normal_range": "string",
+      "current_value": "string"
+    }
+  ],
+  "anomalies": [
+    {
+      "description": "string describing the anomaly",
+      "severity": "Critical" | "High" | "Medium" | "Low",
+      "confidence": number (0-1),
+      "evidence": ["list of evidence items"],
+      "deviation_score": number (0-10),
+      "mitre_technique_id": "string (if applicable)"
+    }
+  ],
+  "data_sources": ["list of data sources analyzed"],
+  "mitre_techniques": ["list of potential MITRE techniques"],
+  "confidence": number (0-1),
+  "recommendations": ["list of recommended actions"]
+}
+`,
+
+  THREAT_HUNT_VALIDATE: (target: string, context: any) => `
+You are a purple team analyst validating detection capabilities against known attack techniques.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Your task is to:
+1. Test detection rules against simulated attack patterns
+2. Measure detection rate and coverage
+3. Identify blind spots and detection gaps
+4. Recommend detection improvements
+
+Output a JSON object with this structure:
+{
+  "techniques_tested": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "detected": boolean,
+      "detection_method": "string",
+      "detection_latency": "string"
+    }
+  ],
+  "detection_rate": number (0-100, percentage),
+  "detection_gaps": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "gap_reason": "string",
+      "risk_level": "Critical" | "High" | "Medium" | "Low",
+      "remediation": "string"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": number (1-10),
+      "recommendation": "string",
+      "expected_improvement": "string"
+    }
+  ],
+  "confidence": number (0-1)
+}
+`,
+
+  // Incident Response Prompts
+  INCIDENT_TRIAGE: (target: string, alertData: any) => `
+You are an incident response analyst performing initial triage of a security alert.
+
+Target: ${target}
+Alert Data: ${JSON.stringify(alertData, null, 2)}
+
+Your task is to:
+1. Classify the incident (true positive, false positive, benign positive)
+2. Assess severity and potential impact
+3. Determine scope of affected assets
+4. Recommend immediate response actions
+
+Output a JSON object with this structure:
+{
+  "classification": "TRUE_POSITIVE" | "FALSE_POSITIVE" | "BENIGN_POSITIVE",
+  "severity": "Critical" | "High" | "Medium" | "Low",
+  "summary": "string describing the incident",
+  "attack_vector": "string",
+  "affected_assets": ["list of affected IPs/systems"],
+  "priority": number (1-10),
+  "escalation_required": boolean,
+  "immediate_actions": ["list of immediate actions to take"],
+  "recommended_actions": [
+    {
+      "action": "string",
+      "priority": number (1-10),
+      "rationale": "string"
+    }
+  ],
+  "ioc_indicators": ["list of IOCs found"],
+  "confidence": number (0-1)
+}
+`,
+
+  INCIDENT_CONTAIN: (target: string, incidentData: any) => `
+You are an incident response analyst executing containment procedures.
+
+Target: ${target}
+Incident Data: ${JSON.stringify(incidentData, null, 2)}
+
+Your task is to:
+1. Develop a containment strategy (isolation, blocking, throttling)
+2. Define the isolation scope to prevent lateral movement
+3. Execute containment actions while preserving evidence
+4. Verify containment effectiveness
+
+Output a JSON object with this structure:
+{
+  "containment_strategy": "string describing the approach",
+  "reasoning": "string explaining why this strategy was chosen",
+  "isolation_scope": {
+    "network_segments": ["list of segments to isolate"],
+    "systems": ["list of systems to isolate"],
+    "accounts": ["list of accounts to disable"]
+  },
+  "containment_steps": [
+    {
+      "action": "string",
+      "target": "string",
+      "command": "string (if applicable)",
+      "expected_outcome": "string",
+      "evidence_preserved": boolean
+    }
+  ],
+  "containment_verified": boolean,
+  "next_steps": ["list of follow-up actions"],
+  "confidence": number (0-1)
+}
+`,
+
+  INCIDENT_ERADICATE: (target: string, incidentData: any) => `
+You are an incident response analyst performing threat eradication.
+
+Target: ${target}
+Incident Data: ${JSON.stringify(incidentData, null, 2)}
+
+Your task is to:
+1. Identify all threat artifacts (malware, backdoors, modified files)
+2. Identify persistence mechanisms
+3. Remove all threat components
+4. Verify clean system state
+
+Output a JSON object with this structure:
+{
+  "reasoning": "string explaining the eradication approach",
+  "artifacts": [
+    {
+      "type": "string (malware, backdoor, modified_file, rogue_account, etc.)",
+      "location": "string",
+      "description": "string",
+      "removed": boolean
+    }
+  ],
+  "persistence_mechanisms": [
+    {
+      "type": "string (registry, scheduled_task, service, cron, etc.)",
+      "location": "string",
+      "cleared": boolean
+    }
+  ],
+  "eradication_steps": [
+    {
+      "action": "string",
+      "description": "string",
+      "target": "string",
+      "verification": "string"
+    }
+  ],
+  "clean_scan": boolean,
+  "residual_risk": "low" | "medium" | "high",
+  "confidence": number (0-1)
+}
+`,
+
+  INCIDENT_RECOVER: (target: string, incidentData: any) => `
+You are an incident response analyst performing system recovery after threat eradication.
+
+Target: ${target}
+Incident Data: ${JSON.stringify(incidentData, null, 2)}
+
+Your task is to:
+1. Plan system restoration and service recovery
+2. Validate system integrity before restoring services
+3. Apply additional hardening measures
+4. Document lessons learned
+
+Output a JSON object with this structure:
+{
+  "reasoning": "string explaining the recovery approach",
+  "recovery_strategy": "string",
+  "recovery_steps": [
+    {
+      "action": "string",
+      "description": "string",
+      "target": "string",
+      "verification": "string"
+    }
+  ],
+  "services_to_restore": ["list of services"],
+  "services_restored": ["list of services successfully restored"],
+  "validation_steps": ["list of validation steps performed"],
+  "recovery_validated": boolean,
+  "hardening_applied": [
+    {
+      "measure": "string",
+      "target": "string",
+      "status": "applied" | "pending"
+    }
+  ],
+  "lessons_learned": [
+    {
+      "finding": "string",
+      "recommendation": "string",
+      "priority": number (1-10)
+    }
+  ],
+  "confidence": number (0-1)
+}
+`,
+
+  // Posture Assessment Prompts
+  POSTURE_ASSESSMENT: (target: string, context: any) => `
+You are a purple team security analyst performing a comprehensive security posture assessment.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Your task is to:
+1. Evaluate overall security posture across all domains
+2. Score detection, prevention, and response capabilities
+3. Identify gaps in security coverage
+4. Map capabilities to MITRE ATT&CK framework
+
+Output a JSON object with this structure:
+{
+  "overall_score": number (0-100),
+  "detection_coverage": number (0-100, percentage),
+  "response_readiness": number (0-100, percentage),
+  "category_scores": {
+    "network_security": number (0-100),
+    "endpoint_security": number (0-100),
+    "identity_access": number (0-100),
+    "data_protection": number (0-100),
+    "incident_response": number (0-100),
+    "monitoring_logging": number (0-100)
+  },
+  "gaps": [
+    {
+      "area": "string",
+      "severity": "Critical" | "High" | "Medium" | "Low",
+      "description": "string",
+      "mitre_techniques_uncovered": ["list of technique IDs"],
+      "remediation": "string"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": number (1-10),
+      "category": "string",
+      "recommendation": "string",
+      "expected_improvement": "string",
+      "effort": "LOW" | "MEDIUM" | "HIGH"
+    }
+  ],
+  "mitre_coverage": {
+    "initial_access": number (0-100),
+    "execution": number (0-100),
+    "persistence": number (0-100),
+    "privilege_escalation": number (0-100),
+    "defense_evasion": number (0-100),
+    "credential_access": number (0-100),
+    "discovery": number (0-100),
+    "lateral_movement": number (0-100),
+    "collection": number (0-100),
+    "exfiltration": number (0-100),
+    "command_and_control": number (0-100),
+    "impact": number (0-100)
+  },
+  "confidence": number (0-1)
+}
+`,
+
+  POSTURE_CONTROLS: (target: string, context: any) => `
+You are a purple team analyst evaluating security control effectiveness.
+
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Evaluate deployed security controls for effectiveness. Output JSON with:
+{
+  "controls_evaluated": [
+    {
+      "control_name": "string",
+      "category": "string",
+      "effectiveness": number (0-100),
+      "status": "effective" | "degraded" | "failing",
+      "findings": ["list of issues"]
+    }
+  ],
+  "average_effectiveness": number (0-100),
+  "failing_controls": ["list of control names with issues"],
+  "recommendations": [
+    {
+      "control": "string",
+      "recommendation": "string",
+      "priority": number (1-10)
+    }
+  ],
+  "confidence": number (0-1)
+}
+`,
+
+  POSTURE_MITRE_COVERAGE: (target: string, context: any) => `
+You are a purple team analyst mapping detection capabilities to the MITRE ATT&CK framework.
+
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Map detection and prevention capabilities to MITRE ATT&CK. Output JSON with:
+{
+  "techniques_mapped": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "tactic": "string",
+      "coverage": "full" | "partial" | "none",
+      "detection_method": "string",
+      "data_source": "string"
+    }
+  ],
+  "coverage_by_tactic": {
+    "initial_access": number (0-100),
+    "execution": number (0-100),
+    "persistence": number (0-100),
+    "privilege_escalation": number (0-100),
+    "defense_evasion": number (0-100),
+    "credential_access": number (0-100),
+    "discovery": number (0-100),
+    "lateral_movement": number (0-100),
+    "collection": number (0-100),
+    "exfiltration": number (0-100),
+    "command_and_control": number (0-100),
+    "impact": number (0-100)
+  },
+  "uncovered_techniques": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "risk": "Critical" | "High" | "Medium" | "Low"
+    }
+  ],
+  "overall_coverage": number (0-100),
+  "priority_gaps": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "tactic": "string",
+      "risk": "string",
+      "recommendation": "string"
+    }
+  ],
+  "recommendations": ["list of improvement recommendations"],
+  "confidence": number (0-1)
+}
+`,
+
+  POSTURE_SCORECARD: (target: string, context: any) => `
+You are a purple team analyst generating a security scorecard.
+
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Generate a comprehensive security scorecard. Output JSON with:
+{
+  "overall_grade": "A" | "B" | "C" | "D" | "F",
+  "overall_score": number (0-100),
+  "categories": [
+    {
+      "name": "string",
+      "score": number (0-100),
+      "grade": "A" | "B" | "C" | "D" | "F",
+      "key_findings": ["list of findings"],
+      "trend": "improving" | "stable" | "declining"
+    }
+  ],
+  "trend": "improving" | "stable" | "declining",
+  "executive_summary": "string",
+  "top_risks": ["list of top risks"],
+  "confidence": number (0-1)
+}
+`,
+
+  // Threat Intelligence Prompts
+  THREAT_INTEL_CORRELATE: (target: string, context: any) => `
+You are a threat intelligence analyst correlating indicators of compromise.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Correlate IOCs across multiple intelligence sources. Output JSON with:
+{
+  "total_iocs": number,
+  "correlated_iocs": [
+    {
+      "type": "IP" | "DOMAIN" | "HASH" | "URL" | "EMAIL" | "FILE_PATH",
+      "value": "string",
+      "source": "string",
+      "correlation_score": number (0-1),
+      "related_campaigns": ["list of campaign names"],
+      "first_seen": "string (date)",
+      "last_seen": "string (date)"
+    }
+  ],
+  "high_confidence_matches": number,
+  "campaigns_identified": ["list of campaign names"],
+  "threat_attribution": "string (threat actor name or unknown)",
+  "attribution_confidence": number (0-100),
+  "risk_assessment": "string",
+  "recommendations": ["list of recommended actions"],
+  "confidence": number (0-1)
+}
+`,
+
+  THREAT_INTEL_PROFILE: (context: any) => `
+You are a threat intelligence analyst building a threat actor profile.
+
+Context: ${JSON.stringify(context, null, 2)}
+
+Build a comprehensive threat actor profile. Output JSON with:
+{
+  "primary_actor": "string (threat actor name)",
+  "aliases": ["list of known aliases"],
+  "motivation": "string (financial, espionage, hacktivism, destruction)",
+  "capability_level": "basic" | "intermediate" | "advanced" | "nation_state",
+  "associated_ttps": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "frequency": "common" | "occasional" | "rare"
+    }
+  ],
+  "predicted_actions": ["list of likely next actions"],
+  "defensive_priorities": ["list of defensive priorities"],
+  "historical_campaigns": [
+    {
+      "name": "string",
+      "date": "string",
+      "targets": ["list of target types"],
+      "outcome": "string"
+    }
+  ],
+  "confidence": number (0-1)
+}
+`,
+
+  THREAT_INTEL_CAMPAIGN: (target: string, context: any) => `
+You are a threat intelligence analyst mapping an attack campaign.
+
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+
+Map observed activities to attack campaigns. Output JSON with:
+{
+  "campaign_name": "string",
+  "kill_chain_phase": "string (reconnaissance | weaponization | delivery | exploitation | installation | command_and_control | actions_on_objectives)",
+  "mitre_mappings": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "tactic": "string",
+      "observed": boolean,
+      "detection_status": "DETECTED" | "MISSED" | "PARTIAL",
+      "evidence": "string"
+    }
+  ],
+  "attack_timeline": [
+    {
+      "phase": "string",
+      "timestamp": "string",
+      "activity": "string",
+      "technique": "string"
+    }
+  ],
+  "overall_risk": "low" | "medium" | "high" | "critical",
+  "countermeasures": [
+    {
+      "technique_id": "string",
+      "countermeasure": "string",
+      "priority": number (1-10)
+    }
+  ],
+  "confidence": number (0-1)
+}
+`,
+
+  THREAT_INTEL_ENRICH: (context: any) => `
+You are a threat intelligence analyst enriching indicators with additional context.
+
+Context: ${JSON.stringify(context, null, 2)}
+
+Enrich provided indicators with threat intelligence. Output JSON with:
+{
+  "indicators_enriched": number,
+  "enriched_indicators": [
+    {
+      "original_value": "string",
+      "type": "string",
+      "risk_score": number (0-100),
+      "context": "string",
+      "related_threats": ["list of related threat names"],
+      "mitre_techniques": ["list of technique IDs"],
+      "tags": ["list of tags"]
+    }
+  ],
+  "sources": ["list of intelligence sources used"],
+  "new_context_items": number,
+  "risk_adjustments": number,
+  "mitre_mappings": [
+    {
+      "technique_id": "string",
+      "technique_name": "string",
+      "relevance": "high" | "medium" | "low"
+    }
+  ],
+  "risk_summary": {
+    "overall_risk": "low" | "medium" | "high" | "critical",
+    "key_findings": ["list of key findings"]
+  },
+  "actionable_intelligence": ["list of actionable items"],
+  "confidence": number (0-1)
+}
+`,
+
   // Orchestrator Coordination Prompt
   ORCHESTRATOR_COORDINATION: (state: any) => `
 You are the orchestrator coordinating a multi-agent cybersecurity simulation.
