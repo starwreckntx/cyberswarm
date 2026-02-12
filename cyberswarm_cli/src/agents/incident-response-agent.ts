@@ -57,13 +57,19 @@ export class IncidentResponseAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const alertData = task.details || {};
 
+    const theHiveTool = this.getTool('thehive');
+    const cortexTool = this.getTool('cortex');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Incident triage",
-      `Performing initial triage of security alert on ${target}. Classifying incident and assessing scope.`,
-      { target, alertData }
+      `Performing initial triage on ${target}. Creating case in ${theHiveTool?.name || 'TheHive'} and running ${cortexTool?.name || 'Cortex'} analyzers for IOC enrichment.`,
+      { target, alertData, tools: ['thehive', 'cortex', 'velociraptor'] }
     );
+
+    if (theHiveTool) this.logToolUsage('thehive', 'thehive-api create-case --severity high', target, {}, task.taskId);
+    if (cortexTool) this.logToolUsage('cortex', 'cortex-analyzer --run VirusTotal,AbuseIPDB', target, {}, task.taskId);
 
     await this.delay(1500, 3000);
 
@@ -153,13 +159,18 @@ export class IncidentResponseAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const incidentData = task.details || {};
 
+    const grrTool = this.getTool('grr');
+    const velociraptor = this.getTool('velociraptor');
+
     this.logChainOfThought(
       2,
       "decision",
       "Containment strategy",
-      `Developing containment strategy for incident on ${target}. Consulting Gemini AI for optimal isolation approach.`,
-      { target, incidentData }
+      `Developing containment strategy for ${target}. Deploying ${grrTool?.name || 'GRR'} for remote isolation and ${velociraptor?.name || 'Velociraptor'} for endpoint containment. Consulting Gemini AI for optimal approach.`,
+      { target, incidentData, tools: ['grr', 'velociraptor', 'wireshark'] }
     );
+
+    if (grrTool) this.logToolUsage('grr', 'grr-client --isolate-endpoint', target, {}, task.taskId);
 
     await this.delay(1500, 3000);
 
@@ -232,13 +243,18 @@ export class IncidentResponseAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const incidentData = task.details || {};
 
+    const volatilityTool = this.getTool('volatility');
+    const velociraptor = this.getTool('velociraptor');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Threat eradication planning",
-      `Planning complete threat eradication for ${target}. Identifying all threat artifacts and persistence mechanisms.`,
-      { target, incidentData }
+      `Planning eradication for ${target}. Using ${volatilityTool?.name || 'Volatility'} for memory forensics to identify injected code, ${velociraptor?.name || 'Velociraptor'} for artifact collection and removal.`,
+      { target, incidentData, tools: ['volatility', 'velociraptor', 'yara'] }
     );
+
+    if (volatilityTool) this.logToolUsage('volatility', 'vol3 -f memdump.raw windows.malfind', target, {}, task.taskId);
 
     await this.delay(2000, 4000);
 
@@ -304,13 +320,17 @@ export class IncidentResponseAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const incidentData = task.details || {};
 
+    const autopsyTool = this.getTool('autopsy');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Recovery planning",
-      `Planning system recovery for ${target}. Restoring services and validating integrity.`,
-      { target, incidentData }
+      `Planning system recovery for ${target}. Using ${autopsyTool?.name || 'Autopsy'} for integrity validation and forensic evidence preservation before restoring services.`,
+      { target, incidentData, tools: ['autopsy', 'velociraptor', 'grr'] }
     );
+
+    if (autopsyTool) this.logToolUsage('autopsy', 'autopsy --verify-integrity --baseline', target, {}, task.taskId);
 
     await this.delay(2000, 3000);
 

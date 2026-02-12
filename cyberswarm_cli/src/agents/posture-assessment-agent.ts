@@ -57,13 +57,20 @@ export class PostureAssessmentAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const availableTools = this.getAvailableTools();
+    const nessusTool = this.getTool('nessus');
+    const openvasTool = this.getTool('openvas');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Comprehensive posture assessment",
-      `Evaluating overall security posture for ${target}. Analyzing detection, prevention, and response capabilities.`,
-      { target, context }
+      `Evaluating security posture for ${target} using ${availableTools.length} tools. Running ${nessusTool?.name || 'Nessus'} compliance audit, ${openvasTool?.name || 'OpenVAS'} vulnerability assessment, and detection engineering validation.`,
+      { target, context, tools: availableTools.map(t => t.id) }
     );
+
+    if (nessusTool) this.logToolUsage('nessus', 'nessus-scan --policy compliance-audit --target', target, { scanPolicy: 'Compliance' }, task.taskId);
+    if (openvasTool) this.logToolUsage('openvas', 'omp --xml "<create_task><config id=full-and-fast/>"', target, {}, task.taskId);
 
     await this.delay(3000, 5000);
 
@@ -137,13 +144,19 @@ export class PostureAssessmentAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const atomicTool = this.getTool('atomic-red-team');
+    const calderaTool = this.getTool('caldera');
+    const suricataTool = this.getTool('suricata');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Security controls evaluation",
-      `Evaluating effectiveness of deployed security controls on ${target}.`,
-      { target, context }
+      `Evaluating security controls on ${target}. Using ${atomicTool?.name || 'Atomic Red Team'} to test detection rules, ${calderaTool?.name || 'MITRE Caldera'} for adversary emulation, ${suricataTool?.name || 'Suricata'} IDS rule validation.`,
+      { target, context, tools: ['atomic-red-team', 'caldera', 'suricata'] }
     );
+
+    if (atomicTool) this.logToolUsage('atomic-red-team', 'Invoke-AtomicTest -All -GetPrereqs', target, {}, task.taskId);
 
     await this.delay(2500, 4000);
 
@@ -192,13 +205,18 @@ export class PostureAssessmentAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const sigmaTool = this.getTool('sigma');
+    const nucleiTool = this.getTool('nuclei');
+
     this.logChainOfThought(
       2,
       "analysis",
       "MITRE ATT&CK coverage mapping",
-      `Mapping detection and prevention capabilities to MITRE ATT&CK framework for ${target}.`,
-      { target, context }
+      `Mapping capabilities to MITRE ATT&CK for ${target}. Cross-referencing ${sigmaTool?.name || 'Sigma'} detection rules and ${nucleiTool?.name || 'Nuclei'} templates against technique IDs.`,
+      { target, context, tools: ['sigma', 'nuclei', 'elastic-siem', 'caldera'] }
     );
+
+    if (sigmaTool) this.logToolUsage('sigma', 'sigma-cli convert --target splunk --pipeline sysmon', target, {}, task.taskId);
 
     await this.delay(3000, 5000);
 
@@ -249,12 +267,14 @@ export class PostureAssessmentAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const availableTools = this.getAvailableTools();
+
     this.logChainOfThought(
       2,
       "analysis",
       "Security scorecard generation",
-      `Generating comprehensive security scorecard for ${target} based on all available assessment data.`,
-      { target, context }
+      `Generating security scorecard for ${target}. Aggregating results from ${availableTools.length} security tools across vulnerability scanning, detection engineering, and network monitoring categories.`,
+      { target, context, tools: availableTools.map(t => t.id) }
     );
 
     await this.delay(2000, 4000);

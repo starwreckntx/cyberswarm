@@ -57,13 +57,19 @@ export class ThreatIntelligenceAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const mispTool = this.getTool('misp');
+    const openctiTool = this.getTool('opencti');
+
     this.logChainOfThought(
       2,
       "analysis",
       "IOC correlation analysis",
-      `Correlating indicators of compromise from multiple sources for ${target}. Cross-referencing with threat intelligence feeds.`,
-      { target, context }
+      `Correlating IOCs for ${target}. Querying ${mispTool?.name || 'MISP'} threat feeds and ${openctiTool?.name || 'OpenCTI'} STIX data for cross-reference with threat intelligence sources.`,
+      { target, context, tools: ['misp', 'opencti', 'maltego'] }
     );
+
+    if (mispTool) this.logToolUsage('misp', 'misp-api search --type attributes --category Network', target, { returnFormat: 'json' }, task.taskId);
+    if (openctiTool) this.logToolUsage('opencti', 'opencti-api stix-relations --type indicates', target, {}, task.taskId);
 
     await this.delay(2500, 4500);
 
@@ -141,13 +147,18 @@ export class ThreatIntelligenceAgent extends BaseAgent {
     const target = task.target;
     const context = task.details || {};
 
+    const maltegoTool = this.getTool('maltego');
+    const openctiTool = this.getTool('opencti');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Threat actor profiling",
-      `Building threat actor profile based on observed TTPs and indicators. Correlating with known threat actor databases.`,
-      { context }
+      `Building threat actor profile using ${maltegoTool?.name || 'Maltego'} link analysis and ${openctiTool?.name || 'OpenCTI'} threat actor database. Correlating with known adversary TTPs.`,
+      { context, tools: ['maltego', 'opencti', 'misp'] }
     );
+
+    if (maltegoTool) this.logToolUsage('maltego', 'maltego-transform --entity ThreatActor', target || 'unknown', {}, task.taskId);
 
     await this.delay(3000, 5000);
 
@@ -205,13 +216,18 @@ export class ThreatIntelligenceAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const mispTool = this.getTool('misp');
+    const openctiTool = this.getTool('opencti');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Attack campaign mapping",
-      `Mapping observed activities to known attack campaigns. Constructing attack timeline and kill chain.`,
-      { target, context }
+      `Mapping observed activities using ${mispTool?.name || 'MISP'} campaign correlation and ${openctiTool?.name || 'OpenCTI'} kill chain analysis. Constructing attack timeline.`,
+      { target, context, tools: ['misp', 'opencti', 'maltego'] }
     );
+
+    if (mispTool) this.logToolUsage('misp', 'misp-api search --type events --tags campaign', target, {}, task.taskId);
 
     await this.delay(3000, 5000);
 
@@ -271,13 +287,18 @@ export class ThreatIntelligenceAgent extends BaseAgent {
     const target = task.target;
     const context = task.details || {};
 
+    const cortexTool = this.getTool('cortex');
+    const mispTool = this.getTool('misp');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Indicator enrichment",
-      `Enriching indicators with additional context from threat intelligence sources. Adding MITRE ATT&CK mappings and risk scores.`,
-      { context }
+      `Enriching indicators using ${cortexTool?.name || 'Cortex'} analyzers (VirusTotal, AbuseIPDB, Shodan) and ${mispTool?.name || 'MISP'} warninglists. Adding MITRE ATT&CK mappings and risk scores.`,
+      { context, tools: ['cortex', 'misp', 'opencti'] }
     );
+
+    if (mispTool) this.logToolUsage('misp', 'misp-api enrich --warninglist-check', target || 'indicators', {}, task.taskId);
 
     await this.delay(2000, 3500);
 

@@ -4,6 +4,81 @@ export type AgentStatus = "IDLE" | "BUSY" | "ERROR" | "OFFLINE";
 export type TaskStatus = "PENDING" | "ASSIGNED" | "EXECUTING" | "COMPLETED" | "FAILED";
 export type Severity = "Critical" | "High" | "Medium" | "Low";
 
+// Security Tool Types
+export type ToolCategory =
+  | "reconnaissance"
+  | "vulnerability_scanning"
+  | "exploitation"
+  | "post_exploitation"
+  | "forensics"
+  | "threat_hunting"
+  | "incident_response"
+  | "threat_intelligence"
+  | "network_monitoring"
+  | "defense_evasion"
+  | "payload_generation"
+  | "credential_access"
+  | "lateral_movement"
+  | "persistence"
+  | "detection_engineering";
+
+export interface SecurityTool {
+  id: string;
+  name: string;
+  description: string;
+  category: ToolCategory;
+  subcategories: string[];
+  capabilities: string[];
+  mitreTechniques: string[];
+  platforms: ("linux" | "windows" | "macos" | "network" | "cloud" | "cross_platform")[];
+  defaultOptions: Record<string, any>;
+  outputFormat: string;
+  riskLevel: "low" | "medium" | "high" | "critical";
+  requiresPrivilege: boolean;
+  documentation?: string;
+}
+
+export interface ToolExecution {
+  toolId: string;
+  toolName: string;
+  command: string;
+  options: Record<string, any>;
+  target?: string;
+  startedAt: Date;
+  completedAt?: Date;
+  exitCode?: number;
+  output?: any;
+  agentId: string;
+  taskId?: string;
+}
+
+export interface ToolResult {
+  toolId: string;
+  success: boolean;
+  output: any;
+  parsedData?: any;
+  executionTime: number;
+  errorMessage?: string;
+}
+
+export interface MitreTechnique {
+  techniqueId: string;
+  name: string;
+  tactic: string;
+  description: string;
+  platforms: string[];
+  dataSources: string[];
+  detectionMethods: string[];
+  tools: string[];
+  severity: Severity;
+}
+
+export interface MitreAttackData {
+  techniques: MitreTechnique[];
+  tactics: string[];
+  version: string;
+}
+
 // Agent Types
 export interface Agent {
   id: string;

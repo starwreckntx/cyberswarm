@@ -1,0 +1,352 @@
+{
+  "version": "14.1",
+  "tactics": [
+    "Reconnaissance", "Resource Development", "Initial Access", "Execution",
+    "Persistence", "Privilege Escalation", "Defense Evasion", "Credential Access",
+    "Discovery", "Lateral Movement", "Collection", "Command and Control",
+    "Exfiltration", "Impact"
+  ],
+  "techniques": [
+    {
+      "techniqueId": "T1595",
+      "name": "Active Scanning",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may execute active reconnaissance scans to gather information that can be used during targeting.",
+      "platforms": ["PRE"],
+      "dataSources": ["Network Traffic: Network Traffic Flow", "Network Traffic: Network Traffic Content"],
+      "detectionMethods": ["IDS/IPS signatures", "Firewall logs", "Network flow analysis"],
+      "tools": ["nmap", "masscan", "shodan"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1595.002",
+      "name": "Vulnerability Scanning",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may scan victims for vulnerabilities that can be used during targeting.",
+      "platforms": ["PRE"],
+      "dataSources": ["Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["IDS signatures for vulnerability scanners", "Web application firewall logs"],
+      "tools": ["nessus", "openvas", "nuclei", "nikto"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1590",
+      "name": "Gather Victim Network Information",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may gather information about the victim's networks that can be used during targeting.",
+      "platforms": ["PRE"],
+      "dataSources": ["Internet Scan: Response Content"],
+      "detectionMethods": ["DNS query monitoring", "Certificate transparency monitoring"],
+      "tools": ["amass", "shodan", "nmap"],
+      "severity": "Low"
+    },
+    {
+      "techniqueId": "T1593",
+      "name": "Search Open Websites/Domains",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may search freely available websites and/or domains for information about victims.",
+      "platforms": ["PRE"],
+      "dataSources": [],
+      "detectionMethods": ["Web analytics", "Social media monitoring"],
+      "tools": ["maltego", "shodan", "amass"],
+      "severity": "Low"
+    },
+    {
+      "techniqueId": "T1596",
+      "name": "Search Open Technical Databases",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may search freely available technical databases for information about victims.",
+      "platforms": ["PRE"],
+      "dataSources": [],
+      "detectionMethods": ["Certificate transparency monitoring"],
+      "tools": ["shodan", "maltego", "amass"],
+      "severity": "Low"
+    },
+    {
+      "techniqueId": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "description": "Adversaries may attempt to exploit a weakness in an Internet-facing host or system to initially access a network.",
+      "platforms": ["Linux", "Windows", "macOS", "Containers"],
+      "dataSources": ["Application Log: Application Log Content", "Network Traffic: Network Traffic Content"],
+      "detectionMethods": ["WAF alerts", "Application error logs", "IDS/IPS signatures"],
+      "tools": ["metasploit", "sqlmap", "nuclei"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1046",
+      "name": "Network Service Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get a listing of services running on remote hosts and local network infrastructure devices.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["Network flow analysis", "Port scan detection", "Endpoint logging"],
+      "tools": ["nmap", "masscan"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Process: Process Creation", "Script: Script Execution"],
+      "detectionMethods": ["Process monitoring", "Command line logging", "Script block logging"],
+      "tools": ["metasploit", "cobalt-strike", "atomic-red-team", "caldera"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1053",
+      "name": "Scheduled Task/Job",
+      "tactic": "Persistence",
+      "description": "Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code.",
+      "platforms": ["Linux", "Windows", "macOS", "Containers"],
+      "dataSources": ["Command: Command Execution", "Scheduled Job: Scheduled Job Creation"],
+      "detectionMethods": ["Task scheduler monitoring", "Cron job auditing", "Process creation events"],
+      "tools": ["cobalt-strike", "atomic-red-team", "caldera", "impacket"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1547",
+      "name": "Boot or Logon Autostart Execution",
+      "tactic": "Persistence",
+      "description": "Adversaries may configure system settings to automatically execute a program during system boot or logon.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Windows Registry: Windows Registry Key Modification"],
+      "detectionMethods": ["Registry monitoring", "Startup folder monitoring", "Autoruns analysis"],
+      "tools": ["cobalt-strike", "atomic-red-team", "caldera"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1068",
+      "name": "Exploitation for Privilege Escalation",
+      "tactic": "Privilege Escalation",
+      "description": "Adversaries may exploit software vulnerabilities in an attempt to elevate privileges.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Process: Process Creation"],
+      "detectionMethods": ["Exploit detection signatures", "Anomalous process behavior", "Crash reports"],
+      "tools": ["metasploit"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1055",
+      "name": "Process Injection",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may inject code into processes to evade process-based defenses as well as possibly elevate privileges.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Process: OS API Execution", "Process: Process Modification"],
+      "detectionMethods": ["API monitoring", "Process hollowing detection", "Memory forensics"],
+      "tools": ["metasploit", "cobalt-strike", "sliver", "volatility"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1027",
+      "name": "Obfuscated Files or Information",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may attempt to make an executable or file difficult to discover or analyze by encrypting, encoding, or otherwise obfuscating its contents.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["File: File Creation", "Process: Process Creation"],
+      "detectionMethods": ["YARA rules", "Entropy analysis", "Behavioral analysis"],
+      "tools": ["yara", "msfvenom", "atomic-red-team"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1562",
+      "name": "Impair Defenses",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may maliciously modify components of a victim environment in order to hinder or disable defensive mechanisms.",
+      "platforms": ["Linux", "Windows", "macOS", "Containers"],
+      "dataSources": ["Command: Command Execution", "Process: Process Termination"],
+      "detectionMethods": ["Service monitoring", "Security tool status monitoring", "Event log monitoring"],
+      "tools": ["atomic-red-team"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1003",
+      "name": "OS Credential Dumping",
+      "tactic": "Credential Access",
+      "description": "Adversaries may attempt to dump credentials to obtain account login and credential material.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Process: OS API Execution"],
+      "detectionMethods": ["LSASS access monitoring", "SAM registry access", "Credential guard alerts"],
+      "tools": ["mimikatz", "impacket", "hashcat", "john", "volatility"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1003.001",
+      "name": "LSASS Memory",
+      "tactic": "Credential Access",
+      "description": "Adversaries may attempt to access credential material stored in LSASS process memory.",
+      "platforms": ["Windows"],
+      "dataSources": ["Process: OS API Execution", "Process: Process Access"],
+      "detectionMethods": ["LSASS access monitoring", "Sysmon Event ID 10", "Credential Guard"],
+      "tools": ["mimikatz"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1110.002",
+      "name": "Password Cracking",
+      "tactic": "Credential Access",
+      "description": "Adversaries may use password cracking to attempt to recover usable credentials from captured hashes.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Application Log: Application Log Content", "User Account: User Account Authentication"],
+      "detectionMethods": ["Failed authentication monitoring", "Account lockout policies"],
+      "tools": ["hashcat", "john"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1557",
+      "name": "Adversary-in-the-Middle",
+      "tactic": "Credential Access",
+      "description": "Adversaries may attempt to position themselves between communicating parties to intercept data.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Network Traffic: Network Traffic Content", "Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["ARP monitoring", "DHCP snooping", "Network anomaly detection"],
+      "tools": ["responder", "impacket"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1558.003",
+      "name": "Kerberoasting",
+      "tactic": "Credential Access",
+      "description": "Adversaries may abuse a valid Kerberos TGT or sniff network traffic to obtain a TGS ticket for offline cracking.",
+      "platforms": ["Windows"],
+      "dataSources": ["Active Directory: Active Directory Credential Request"],
+      "detectionMethods": ["Kerberos TGS request monitoring", "Anomalous service ticket requests"],
+      "tools": ["impacket", "bloodhound", "mimikatz"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1087",
+      "name": "Account Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get a listing of valid accounts, usernames, or email addresses on a system or within a compromised environment.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Process: Process Creation"],
+      "detectionMethods": ["LDAP query monitoring", "Net command monitoring", "PowerShell logging"],
+      "tools": ["bloodhound"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1069",
+      "name": "Permission Groups Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to discover group and permission settings.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Group: Group Enumeration"],
+      "detectionMethods": ["LDAP query monitoring", "Net group command monitoring"],
+      "tools": ["bloodhound"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1482",
+      "name": "Domain Trust Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to gather information on domain trust relationships.",
+      "platforms": ["Windows"],
+      "dataSources": ["Command: Command Execution", "Process: Process Creation"],
+      "detectionMethods": ["LDAP query monitoring", "Trust enumeration detection"],
+      "tools": ["bloodhound"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1018",
+      "name": "Remote System Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get a listing of other systems by IP address, hostname, or other logical identifier.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["ARP scanning detection", "DNS query monitoring", "LDAP query monitoring"],
+      "tools": ["nmap"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1021",
+      "name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "description": "Adversaries may use valid accounts to log into a service for remote access.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Logon Session: Logon Session Creation", "Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["Remote login monitoring", "Lateral movement detection", "Authentication anomalies"],
+      "tools": ["metasploit", "cobalt-strike", "impacket", "sliver", "caldera"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1210",
+      "name": "Exploitation of Remote Services",
+      "tactic": "Lateral Movement",
+      "description": "Adversaries may exploit remote services to gain unauthorized access to internal systems.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Application Log: Application Log Content", "Network Traffic: Network Traffic Content"],
+      "detectionMethods": ["IDS/IPS alerts", "Application crash monitoring", "Patch status monitoring"],
+      "tools": ["metasploit"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1071",
+      "name": "Application Layer Protocol",
+      "tactic": "Command and Control",
+      "description": "Adversaries may communicate using OSI application layer protocols to avoid detection/network filtering.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Network Traffic: Network Traffic Content", "Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["Protocol analysis", "DNS tunnel detection", "Beacon detection"],
+      "tools": ["metasploit", "cobalt-strike", "sliver"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1572",
+      "name": "Protocol Tunneling",
+      "tactic": "Command and Control",
+      "description": "Adversaries may tunnel network communications to and from a victim system using an existing protocol.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Network Traffic: Network Traffic Content", "Network Traffic: Network Traffic Flow"],
+      "detectionMethods": ["DNS tunnel detection", "Protocol anomaly detection", "JA3/JA3S fingerprinting"],
+      "tools": ["metasploit", "cobalt-strike", "sliver"],
+      "severity": "High"
+    },
+    {
+      "techniqueId": "T1040",
+      "name": "Network Sniffing",
+      "tactic": "Credential Access",
+      "description": "Adversaries may passively sniff network traffic to capture information.",
+      "platforms": ["Linux", "Windows", "macOS"],
+      "dataSources": ["Command: Command Execution", "Process: Process Creation"],
+      "detectionMethods": ["Promiscuous mode detection", "Process monitoring for packet capture tools"],
+      "tools": ["wireshark", "responder"],
+      "severity": "Medium"
+    },
+    {
+      "techniqueId": "T1078",
+      "name": "Valid Accounts",
+      "tactic": "Persistence",
+      "description": "Adversaries may obtain and abuse credentials of existing accounts.",
+      "platforms": ["Linux", "Windows", "macOS", "Containers"],
+      "dataSources": ["Logon Session: Logon Session Creation", "User Account: User Account Authentication"],
+      "detectionMethods": ["Impossible travel detection", "Anomalous login patterns", "MFA monitoring"],
+      "tools": ["cobalt-strike"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1550",
+      "name": "Use Alternate Authentication Material",
+      "tactic": "Lateral Movement",
+      "description": "Adversaries may use alternate authentication material, such as password hashes, Kerberos tickets, and application access tokens.",
+      "platforms": ["Windows"],
+      "dataSources": ["Active Directory: Active Directory Credential Request", "Logon Session: Logon Session Creation"],
+      "detectionMethods": ["Pass-the-hash detection", "Kerberos anomaly detection", "Golden ticket detection"],
+      "tools": ["mimikatz", "cobalt-strike"],
+      "severity": "Critical"
+    },
+    {
+      "techniqueId": "T1615",
+      "name": "Group Policy Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may gather information on Group Policy settings to identify paths for privilege escalation.",
+      "platforms": ["Windows"],
+      "dataSources": ["Command: Command Execution", "Active Directory: Active Directory Object Access"],
+      "detectionMethods": ["GPO access monitoring", "LDAP query monitoring"],
+      "tools": ["bloodhound"],
+      "severity": "Medium"
+    }
+  ]
+}

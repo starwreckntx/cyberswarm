@@ -57,13 +57,22 @@ export class ThreatHunterAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const availableTools = this.getAvailableTools();
+    const yaraTool = this.getTool('yara');
+    const sigmaTool = this.getTool('sigma');
+    const elasticTool = this.getTool('elastic-siem');
+
     this.logChainOfThought(
       2,
       "analysis",
       "IOC-based threat hunt",
-      `Formulating hypothesis for IOC-based hunting on ${target}. Correlating known indicators of compromise.`,
-      { target, context }
+      `Formulating hypothesis for IOC-based hunting on ${target}. Using ${availableTools.length} available tools: ${yaraTool?.name || 'YARA'} for file/memory scanning, ${sigmaTool?.name || 'Sigma'} for log detection rules, ${elasticTool?.name || 'Elastic SIEM'} for log aggregation.`,
+      { target, context, tools: availableTools.map(t => t.id) }
     );
+
+    // Log tool executions
+    if (yaraTool) this.logToolUsage('yara', 'yara -r /rules/ioc_rules/ /target/filesystem', target, { recursive: true }, task.taskId);
+    if (sigmaTool) this.logToolUsage('sigma', 'sigmac -t elasticsearch -r /rules/sigma/', target, { target: 'elasticsearch' }, task.taskId);
 
     await this.delay(2000, 4000);
 
@@ -137,13 +146,19 @@ export class ThreatHunterAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const osqueryTool = this.getTool('osquery');
+    const zeekTool = this.getTool('zeek');
+
     this.logChainOfThought(
       2,
       "analysis",
       "TTP-based threat hunt",
-      `Hunting for specific tactics, techniques, and procedures (TTPs) across ${target}. Mapping to MITRE ATT&CK framework.`,
-      { target, context }
+      `Hunting for specific TTPs across ${target}. Using ${osqueryTool?.name || 'osquery'} for endpoint telemetry, ${zeekTool?.name || 'Zeek'} for network analysis. Mapping to MITRE ATT&CK framework.`,
+      { target, context, tools: ['osquery', 'zeek', 'sigma', 'elastic-siem'] }
     );
+
+    if (osqueryTool) this.logToolUsage('osquery', 'SELECT * FROM processes WHERE on_disk=0', target, { distributed: true }, task.taskId);
+    if (zeekTool) this.logToolUsage('zeek', 'zeek -r capture.pcap policy/protocols/ssl', target, {}, task.taskId);
 
     await this.delay(2500, 4500);
 
@@ -217,13 +232,18 @@ export class ThreatHunterAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const suricataTool = this.getTool('suricata');
+    const elasticTool = this.getTool('elastic-siem');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Anomaly-based threat hunt",
-      `Establishing behavioral baselines and hunting for deviations on ${target}.`,
-      { target, context }
+      `Establishing behavioral baselines and hunting for deviations on ${target}. Using ${suricataTool?.name || 'Suricata'} for network anomaly detection and ${elasticTool?.name || 'Elastic SIEM'} ML anomaly jobs.`,
+      { target, context, tools: ['suricata', 'elastic-siem', 'osquery'] }
     );
+
+    if (suricataTool) this.logToolUsage('suricata', 'suricata -c /etc/suricata/suricata.yaml -i eth0', target, { mode: 'ids' }, task.taskId);
 
     await this.delay(3000, 5000);
 
@@ -276,13 +296,19 @@ export class ThreatHunterAgent extends BaseAgent {
     const target = task.target || '192.168.1.0/24';
     const context = task.details || {};
 
+    const atomicTool = this.getTool('atomic-red-team');
+    const calderaTool = this.getTool('caldera');
+
     this.logChainOfThought(
       2,
       "analysis",
       "Detection validation",
-      `Validating detection capabilities against known attack patterns on ${target}.`,
-      { target, context }
+      `Validating detection capabilities on ${target}. Running ${atomicTool?.name || 'Atomic Red Team'} tests mapped to MITRE ATT&CK. Orchestrating with ${calderaTool?.name || 'MITRE Caldera'} for automated adversary emulation.`,
+      { target, context, tools: ['atomic-red-team', 'caldera', 'sigma'] }
     );
+
+    if (atomicTool) this.logToolUsage('atomic-red-team', 'Invoke-AtomicTest -AtomicTechnique T1059 -GetPrereqs', target, {}, task.taskId);
+    if (calderaTool) this.logToolUsage('caldera', 'caldera-agent --operation detection-validation', target, {}, task.taskId);
 
     await this.delay(2000, 4000);
 
