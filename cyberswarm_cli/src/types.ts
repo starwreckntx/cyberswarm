@@ -4,6 +4,81 @@ export type AgentStatus = "IDLE" | "BUSY" | "ERROR" | "OFFLINE";
 export type TaskStatus = "PENDING" | "ASSIGNED" | "EXECUTING" | "COMPLETED" | "FAILED";
 export type Severity = "Critical" | "High" | "Medium" | "Low";
 
+// Security Tool Types
+export type ToolCategory =
+  | "reconnaissance"
+  | "vulnerability_scanning"
+  | "exploitation"
+  | "post_exploitation"
+  | "forensics"
+  | "threat_hunting"
+  | "incident_response"
+  | "threat_intelligence"
+  | "network_monitoring"
+  | "defense_evasion"
+  | "payload_generation"
+  | "credential_access"
+  | "lateral_movement"
+  | "persistence"
+  | "detection_engineering";
+
+export interface SecurityTool {
+  id: string;
+  name: string;
+  description: string;
+  category: ToolCategory;
+  subcategories: string[];
+  capabilities: string[];
+  mitreTechniques: string[];
+  platforms: ("linux" | "windows" | "macos" | "network" | "cloud" | "cross_platform")[];
+  defaultOptions: Record<string, any>;
+  outputFormat: string;
+  riskLevel: "low" | "medium" | "high" | "critical";
+  requiresPrivilege: boolean;
+  documentation?: string;
+}
+
+export interface ToolExecution {
+  toolId: string;
+  toolName: string;
+  command: string;
+  options: Record<string, any>;
+  target?: string;
+  startedAt: Date;
+  completedAt?: Date;
+  exitCode?: number;
+  output?: any;
+  agentId: string;
+  taskId?: string;
+}
+
+export interface ToolResult {
+  toolId: string;
+  success: boolean;
+  output: any;
+  parsedData?: any;
+  executionTime: number;
+  errorMessage?: string;
+}
+
+export interface MitreTechnique {
+  techniqueId: string;
+  name: string;
+  tactic: string;
+  description: string;
+  platforms: string[];
+  dataSources: string[];
+  detectionMethods: string[];
+  tools: string[];
+  severity: Severity;
+}
+
+export interface MitreAttackData {
+  techniques: MitreTechnique[];
+  tactics: string[];
+  version: string;
+}
+
 // Agent Types
 export interface Agent {
   id: string;
@@ -101,6 +176,120 @@ export interface AgentInteraction {
   timestamp: Date;
 }
 
+// Purple Team Payloads
+export interface ThreatHunt {
+  hunt_id: string;
+  hypothesis: string;
+  indicators: string[];
+  data_sources: string[];
+  findings: ThreatHuntFinding[];
+  mitre_techniques: string[];
+  status: "IN_PROGRESS" | "COMPLETED" | "ESCALATED";
+}
+
+export interface ThreatHuntFinding {
+  finding_id: string;
+  type: "IOC_MATCH" | "BEHAVIORAL_ANOMALY" | "TTP_DETECTED" | "LATERAL_MOVEMENT" | "PERSISTENCE";
+  description: string;
+  severity: Severity;
+  confidence: number;
+  evidence: string[];
+  mitre_technique_id?: string;
+}
+
+export interface IncidentResponse {
+  incident_id: string;
+  classification: "TRUE_POSITIVE" | "FALSE_POSITIVE" | "BENIGN_POSITIVE";
+  phase: "DETECTION" | "TRIAGE" | "CONTAINMENT" | "ERADICATION" | "RECOVERY" | "LESSONS_LEARNED";
+  actions_taken: IncidentAction[];
+  affected_assets: string[];
+  timeline: IncidentTimelineEntry[];
+  status: "OPEN" | "CONTAINED" | "ERADICATED" | "RECOVERED" | "CLOSED";
+}
+
+export interface IncidentAction {
+  action: string;
+  target: string;
+  result: "SUCCESS" | "FAILED" | "PARTIAL";
+  timestamp: Date;
+}
+
+export interface IncidentTimelineEntry {
+  timestamp: Date;
+  event: string;
+  source: string;
+  details?: string;
+}
+
+export interface PostureAssessment {
+  assessment_id: string;
+  overall_score: number;
+  detection_coverage: number;
+  response_readiness: number;
+  gap_analysis: PostureGap[];
+  recommendations: PostureRecommendation[];
+  mitre_coverage: Record<string, number>;
+}
+
+export interface PostureGap {
+  area: string;
+  severity: Severity;
+  description: string;
+  mitre_techniques_uncovered: string[];
+  remediation: string;
+}
+
+export interface PostureRecommendation {
+  priority: number;
+  category: string;
+  recommendation: string;
+  expected_improvement: string;
+  effort: "LOW" | "MEDIUM" | "HIGH";
+}
+
+export interface ThreatIntelReport {
+  report_id: string;
+  threat_actors: ThreatActorProfile[];
+  iocs_correlated: CorrelatedIOC[];
+  attack_patterns: AttackPattern[];
+  risk_assessment: string;
+  mitre_mapping: MitreMapping[];
+}
+
+export interface ThreatActorProfile {
+  name: string;
+  aliases: string[];
+  motivation: string;
+  capabilities: string[];
+  ttps: string[];
+  confidence: number;
+}
+
+export interface CorrelatedIOC {
+  ioc_type: "IP" | "DOMAIN" | "HASH" | "URL" | "EMAIL" | "FILE_PATH";
+  value: string;
+  source: string;
+  correlation_score: number;
+  related_campaigns: string[];
+}
+
+export interface AttackPattern {
+  pattern_id: string;
+  name: string;
+  description: string;
+  mitre_technique: string;
+  kill_chain_phase: string;
+  indicators: string[];
+}
+
+export interface MitreMapping {
+  technique_id: string;
+  technique_name: string;
+  tactic: string;
+  observed: boolean;
+  detection_status: "DETECTED" | "MISSED" | "PARTIAL";
+}
+
 // Cybersecurity Event Payloads
 export interface ReconData {
   target_ip: string;
@@ -149,7 +338,11 @@ export enum AgentType {
   VULNERABILITY_SCANNER = "VulnerabilityScannerAgent",
   PATCH_MANAGEMENT = "PatchManagementAgent",
   NETWORK_MONITOR = "NetworkMonitorAgent",
-  STRATEGY_ADAPTATION = "StrategyAdaptationAgent"
+  STRATEGY_ADAPTATION = "StrategyAdaptationAgent",
+  THREAT_HUNTER = "ThreatHunterAgent",
+  INCIDENT_RESPONSE = "IncidentResponseAgent",
+  POSTURE_ASSESSMENT = "PostureAssessmentAgent",
+  THREAT_INTELLIGENCE = "ThreatIntelligenceAgent"
 }
 
 // Event Types Enum
@@ -165,14 +358,31 @@ export enum EventType {
   WEBAPP_SCAN_COMPLETE = "WEBAPP_SCAN_COMPLETE",
   MONITORING_COMPLETE = "MONITORING_COMPLETE",
   DEFENSE_ANALYSIS_COMPLETE = "DEFENSE_ANALYSIS_COMPLETE",
-  TASK_ERROR = "TASK_ERROR"
+  TASK_ERROR = "TASK_ERROR",
+  // Purple Team Events
+  THREAT_HUNT_FINDING = "THREAT_HUNT_FINDING",
+  THREAT_HUNT_COMPLETE = "THREAT_HUNT_COMPLETE",
+  INCIDENT_DETECTED = "INCIDENT_DETECTED",
+  INCIDENT_CONTAINED = "INCIDENT_CONTAINED",
+  INCIDENT_ERADICATED = "INCIDENT_ERADICATED",
+  INCIDENT_RECOVERED = "INCIDENT_RECOVERED",
+  POSTURE_ASSESSMENT_COMPLETE = "POSTURE_ASSESSMENT_COMPLETE",
+  DETECTION_GAP_FOUND = "DETECTION_GAP_FOUND",
+  THREAT_INTEL_REPORT = "THREAT_INTEL_REPORT",
+  IOC_CORRELATED = "IOC_CORRELATED",
+  MITRE_MAPPING_COMPLETE = "MITRE_MAPPING_COMPLETE"
 }
 
 // Logic Pipe Rules
 export enum LogicPipeRule {
   RED_DISCOVERS_BLUE_REACTS = "RED_DISCOVERS_BLUE_REACTS",
   BLUE_DETECTS_RED_ADAPTS = "BLUE_DETECTS_RED_ADAPTS",
-  BLUE_DEFENDS_RED_REEVALUATES = "BLUE_DEFENDS_RED_REEVALUATES"
+  BLUE_DEFENDS_RED_REEVALUATES = "BLUE_DEFENDS_RED_REEVALUATES",
+  // Purple Team Rules
+  PURPLE_HUNT_ON_INTRUSION = "PURPLE_HUNT_ON_INTRUSION",
+  PURPLE_INCIDENT_ON_HUNT_FINDING = "PURPLE_INCIDENT_ON_HUNT_FINDING",
+  PURPLE_POSTURE_ON_DEFENSE = "PURPLE_POSTURE_ON_DEFENSE",
+  PURPLE_INTEL_ON_ADAPTATION = "PURPLE_INTEL_ON_ADAPTATION"
 }
 
 // Configuration Types

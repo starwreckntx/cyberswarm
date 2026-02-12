@@ -1,0 +1,41 @@
+
+# Purple Team Scenario
+# Collaborative red/blue team exercise with threat hunting, incident response,
+# posture assessment, and threat intelligence correlation
+
+name: Purple Team Exercise
+description: Full purple team defensive operations - combines offensive testing with defensive validation, threat hunting, incident response, and security posture assessment
+target: 192.168.1.0/24
+duration: 600000  # 10 minutes
+
+initialTasks:
+  # Start with network monitoring to establish baseline
+  - agentType: NetworkMonitorAgent
+    taskName: monitor_traffic
+    priority: 10
+  # Kick off proactive threat hunting
+  - agentType: ThreatHunterAgent
+    taskName: hunt_anomaly
+    priority: 9
+  # Begin security posture assessment
+  - agentType: PostureAssessmentAgent
+    taskName: assess_posture
+    priority: 8
+  # Correlate existing threat intelligence
+  - agentType: ThreatIntelligenceAgent
+    taskName: correlate_iocs
+    priority: 7
+  # Red team discovery to test blue team detection
+  - agentType: DiscoveryAgent
+    taskName: network_scan
+    priority: 6
+
+parameters:
+  scanDepth: comprehensive
+  aggressiveness: balanced
+  stealthMode: false
+  focusDefense: true
+  enablePurpleTeam: true
+  enableAllAgents: true
+  mitreMappingEnabled: true
+  incidentResponseEnabled: true

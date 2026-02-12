@@ -1,7 +1,8 @@
 // Base Agent Class - Common functionality for all swarm agents with Gemini integration
 
-import { Agent, Task, CyberEvent, ChainOfThought, AgentStatus } from '../types.js';
+import { Agent, Task, CyberEvent, ChainOfThought, AgentStatus, SecurityTool, ToolExecution } from '../types.js';
 import { GeminiClient } from '../gemini/gemini-client.js';
+import { SecurityToolRegistry, getToolRegistry } from '../tools/security-tool-registry.js';
 import { logger } from '../utils/logger.js';
 
 export abstract class BaseAgent {
@@ -11,6 +12,8 @@ export abstract class BaseAgent {
   protected supportedTasks: string[];
   protected status: AgentStatus = "IDLE";
   protected geminiClient: GeminiClient;
+  protected toolRegistry: SecurityToolRegistry;
+  protected toolExecutionLog: ToolExecution[] = [];
   protected onEventCallback?: (event: CyberEvent) => void;
   protected onChainOfThoughtCallback?: (thought: ChainOfThought) => void;
   protected onStatusChangeCallback?: (agentId: string, status: AgentStatus) => void;
@@ -27,8 +30,9 @@ export abstract class BaseAgent {
     this.agentType = agentType;
     this.supportedTasks = supportedTasks;
     this.geminiClient = geminiClient;
-    
-    logger.debug(`Agent initialized: ${agentId} (${agentType})`);
+    this.toolRegistry = getToolRegistry();
+
+    logger.debug(`Agent initialized: ${agentId} (${agentType}) with ${this.getAvailableTools().length} tools`);
   }
 
   // Register callbacks for real-time updates
@@ -176,15 +180,89 @@ export abstract class BaseAgent {
       logger.debug(`[${this.agentId}] Requesting Gemini decision with files`, {
         fileCount: fileUris.length,
       });
-      
+
       const response = await this.geminiClient.generateWithFiles(prompt, fileUris);
       const parsed = JSON.parse(response.text);
-      
+
       logger.debug(`[${this.agentId}] Gemini decision with files received`);
       return parsed as T;
     } catch (error: any) {
       logger.error(`[${this.agentId}] Error getting Gemini decision with files: ${error.message}`);
       throw error;
     }
+  }
+
+  // Get all security tools available to this agent type
+  getAvailableTools(): SecurityTool[] {
+    return this.toolRegistry.getToolsForAgent(this.agentType);
+  }
+
+  // Get a specific tool by ID
+  protected getTool(toolId: string): SecurityTool | undefined {
+    return this.toolRegistry.getTool(toolId);
+  }
+
+  // Get tools that can address a specific MITRE ATT&CK technique
+  protected getToolsForTechnique(techniqueId: string): SecurityTool[] {
+    return this.toolRegistry.getToolsForTechnique(techniqueId);
+  }
+
+  // Log a simulated tool execution in the chain of thought
+  protected logToolUsage(
+    toolId: string,
+    command: string,
+    target: string,
+    options: Record<string, any> = {},
+    taskId?: string
+  ): ToolExecution {
+    const tool = this.toolRegistry.getTool(toolId);
+    const execution: ToolExecution = {
+      toolId,
+      toolName: tool?.name || toolId,
+      command,
+      options,
+      target,
+      startedAt: new Date(),
+      agentId: this.agentId,
+      taskId,
+    };
+
+    this.toolExecutionLog.push(execution);
+
+    logger.info(`[${this.agentId}] Tool execution: ${tool?.name || toolId}`, {
+      command,
+      target,
+      riskLevel: tool?.riskLevel,
+    });
+
+    return execution;
+  }
+
+  // Complete a tool execution log entry
+  protected completeToolExecution(
+    execution: ToolExecution,
+    exitCode: number,
+    output: any
+  ): void {
+    execution.completedAt = new Date();
+    execution.exitCode = exitCode;
+    execution.output = output;
+  }
+
+  // Get tool execution history for this agent
+  getToolExecutionLog(): ToolExecution[] {
+    return [...this.toolExecutionLog];
+  }
+
+  // Get a summary of available tools for Gemini prompt context
+  protected getToolContextForPrompt(): string {
+    const tools = this.getAvailableTools();
+    if (tools.length === 0) return '';
+
+    const toolSummary = tools.map(t =>
+      `- ${t.name} (${t.id}): ${t.description} [${t.category}] [Risk: ${t.riskLevel}] [MITRE: ${t.mitreTechniques.join(', ') || 'N/A'}]`
+    ).join('\n');
+
+    return `\nAvailable Security Tools:\n${toolSummary}\n`;
   }
 }
