@@ -1,0 +1,119 @@
+
+# Self-Healing Swarm Scenario
+# Focused drill for testing swarm self-healing capabilities:
+# internal monitoring, anomaly detection, recovery, and adaptation
+
+name: Self-Healing Swarm Drill
+description: >
+  10-minute drill focusing on the swarm's ability to detect internal
+  anomalies, recover from agent failures, and adapt strategies
+  autonomously. Tests the self-healing feedback loop:
+  AIMonitoring → ForensicsAgent → RecoveryAgent → AdaptationAgent.
+  Simulates agent failures and verifies the swarm recovers without
+  human intervention.
+target: 192.168.1.0/24
+duration: 600000  # 10 minutes
+
+initialTasks:
+  # Phase 1: Establish baseline monitoring
+  - agentType: AIMonitoringAgent
+    taskName: monitor_reasoning_chain
+    priority: 10
+    details:
+      phase: continuous
+      description: Monitor all agent reasoning chains for anomalies
+
+  - agentType: NetworkMonitorAgent
+    taskName: monitor_traffic
+    priority: 10
+    details:
+      phase: baseline
+
+  - agentType: LogAnalysisAgent
+    taskName: log_collection
+    priority: 9
+    details:
+      phase: baseline
+      sources: [agent-logs, system-logs, event-queue]
+
+  # Phase 2: Swarm health assessment
+  - agentType: AdaptationAgent
+    taskName: assess_swarm_health
+    priority: 9
+    details:
+      phase: health_check
+      description: Baseline swarm health assessment
+
+  # Phase 3: Simulate attack for testing blue response
+  - agentType: ReconAgent
+    taskName: network_scan
+    priority: 7
+    details:
+      phase: simulation
+      description: Light recon to trigger blue team response chain
+
+  - agentType: PersistenceAgent
+    taskName: deploy_implant
+    priority: 6
+    details:
+      phase: simulation
+      description: Simulate persistence for forensics testing
+
+  # Phase 4: Forensics and recovery (triggered by logic pipe)
+  - agentType: ForensicsAgent
+    taskName: collect_evidence
+    priority: 8
+    details:
+      phase: investigation
+      description: Proactive evidence collection drill
+
+  - agentType: RecoveryAgent
+    taskName: verify_integrity
+    priority: 7
+    details:
+      phase: verification
+      description: Baseline integrity verification
+
+  # Phase 5: Post-exercise adaptation
+  - agentType: AdaptationAgent
+    taskName: learn_from_incident
+    priority: 5
+    details:
+      phase: learning
+      description: Process drill outcomes for strategy updates
+
+parameters:
+  scanDepth: moderate
+  aggressiveness: low
+  stealthMode: false
+  focusDefense: true
+  enableSelfHealing: true
+  enableAIMonitoring: true
+  enableForensics: true
+  enableRecovery: true
+  enableAdaptation: true
+  simulateAgentFailure: true
+  mitreMappingEnabled: true
+
+teams:
+  red:
+    enabled: true
+    agents: [ReconAgent, PersistenceAgent]
+    objectives:
+      - Light reconnaissance to trigger detection
+      - Simulate persistence for forensics testing
+  blue:
+    enabled: true
+    agents: [NetworkMonitorAgent, LogAnalysisAgent, ContainmentAgent, ForensicsAgent, RecoveryAgent, AIMonitoringAgent]
+    objectives:
+      - Detect and respond to simulated threats
+      - Perform forensic analysis on persistence artifacts
+      - Verify system integrity and recover from changes
+      - Monitor AI reasoning chains for anomalies
+  purple:
+    enabled: true
+    agents: [ThreatHunterAgent, AdaptationAgent]
+    objectives:
+      - Hunt for persistence indicators
+      - Learn from the drill and optimize strategies
+      - Assess overall swarm health

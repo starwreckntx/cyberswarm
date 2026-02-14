@@ -1,0 +1,47 @@
+# Forensics Agent Manifest - Blue Team
+agent_id: forensics-01
+agent_name: Digital Forensics Agent
+agent_type: ForensicsAgent
+team: blue
+description: >
+  Post-incident digital forensics agent for evidence collection and analysis.
+  Deploys MemoryAnalyzer and FileInvestigator sub-agents for comprehensive investigation.
+
+sub_agents:
+  - name: MemoryAnalyzer
+    role: Volatile memory examination for malicious processes, injections, and rootkits
+    tasks: [analyze_memory]
+  - name: FileInvestigator
+    role: Disk forensics, artifact extraction, YARA scanning, and file recovery
+    tasks: [investigate_files]
+
+supported_tasks:
+  - analyze_memory
+  - investigate_files
+  - build_timeline
+  - collect_evidence
+
+tools:
+  - volatility
+  - autopsy
+  - velociraptor
+  - yara
+  - grr
+
+mitre_techniques:
+  - T1003   # OS Credential Dumping (detection)
+  - T1055   # Process Injection (detection)
+  - T1547   # Boot or Logon Autostart (detection)
+  - T1027   # Obfuscated Files (detection)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/forensics-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/forensics-01-key.pem
+
+heartbeat_interval_seconds: 20
+task_timeout_seconds: 600

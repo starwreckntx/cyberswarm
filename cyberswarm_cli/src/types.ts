@@ -446,25 +446,143 @@ export interface AttackAdaptation {
   confidence: number;
 }
 
+// Reconnaissance Payload
+export interface ReconScanResult {
+  scan_id: string;
+  target: string;
+  scan_type: "port_scan" | "service_enum" | "web_crawl" | "footprint";
+  sub_agent: "NetworkScanner" | "WebCrawler";
+  hosts_discovered: number;
+  services_found: Array<{
+    host: string;
+    port: number;
+    service: string;
+    version?: string;
+  }>;
+  web_assets?: Array<{
+    url: string;
+    technology: string;
+    status_code: number;
+  }>;
+  vulnerabilities_hinted: string[];
+}
+
+// Persistence Payload
+export interface PersistenceResult {
+  persistence_id: string;
+  target: string;
+  method: "backdoor" | "scheduled_task" | "registry_key" | "web_shell" | "rootkit";
+  sub_agent: "ImplantDeployer" | "EvasionTuner";
+  success: boolean;
+  access_maintained: boolean;
+  evasion_techniques: string[];
+  detection_risk: "low" | "medium" | "high";
+  mitre_techniques: string[];
+  artifacts_created: string[];
+}
+
+// Forensics Payload
+export interface ForensicAnalysis {
+  analysis_id: string;
+  target: string;
+  analysis_type: "memory" | "disk" | "network" | "timeline";
+  sub_agent: "MemoryAnalyzer" | "FileInvestigator";
+  evidence_collected: Array<{
+    evidence_id: string;
+    type: string;
+    description: string;
+    hash?: string;
+    timestamp?: string;
+  }>;
+  root_cause?: string;
+  timeline: Array<{
+    timestamp: string;
+    event: string;
+    source: string;
+    significance: "low" | "medium" | "high" | "critical";
+  }>;
+  iocs_discovered: string[];
+  recommendations: string[];
+}
+
+// Recovery Payload
+export interface RecoveryResult {
+  recovery_id: string;
+  target: string;
+  action_type: "backup_restore" | "integrity_verify" | "rollback" | "rebuild";
+  sub_agent: "BackupRestorer" | "IntegrityVerifier";
+  success: boolean;
+  systems_restored: string[];
+  integrity_checks: Array<{
+    component: string;
+    status: "passed" | "failed" | "warning";
+    details?: string;
+  }>;
+  rollback_point?: string;
+  downtime_seconds: number;
+}
+
+// Adaptation Payload
+export interface AdaptationInsight {
+  insight_id: string;
+  analysis_type: "incident_learning" | "strategy_optimization" | "model_tuning";
+  sub_agent: "IncidentLearner" | "StrategyOptimizer";
+  lessons_learned: Array<{
+    category: string;
+    finding: string;
+    recommendation: string;
+    priority: "low" | "medium" | "high" | "critical";
+  }>;
+  strategy_updates: Array<{
+    rule_id: string;
+    old_value?: string;
+    new_value: string;
+    rationale: string;
+  }>;
+  detection_improvements: string[];
+  confidence_score: number;
+}
+
+// Swarm Health Status
+export interface SwarmHealthStatus {
+  swarm_id: string;
+  timestamp: Date;
+  agents_healthy: number;
+  agents_degraded: number;
+  agents_failed: number;
+  anomalies: Array<{
+    agent_id: string;
+    anomaly_type: "logic_loop" | "timeout" | "crash" | "drift" | "resource_exhaustion";
+    severity: Severity;
+    description: string;
+  }>;
+  overall_status: "healthy" | "degraded" | "critical";
+}
+
 // Agent Types Enum
 export enum AgentType {
   // Red Team
   DISCOVERY = "DiscoveryAgent",
   OSINT = "OSINTAgent",
+  RECON = "ReconAgent",
   VULNERABILITY_SCANNER = "VulnerabilityScannerAgent",
   EXPLOITATION = "ExploitationAgent",
+  PERSISTENCE = "PersistenceAgent",
   STRATEGY_ADAPTATION = "StrategyAdaptationAgent",
   // Blue Team
   NETWORK_MONITOR = "NetworkMonitorAgent",
   LOG_ANALYSIS = "LogAnalysisAgent",
   PATCH_MANAGEMENT = "PatchManagementAgent",
   CONTAINMENT = "ContainmentAgent",
+  FORENSICS = "ForensicsAgent",
+  RECOVERY = "RecoveryAgent",
   AI_MONITORING = "AIMonitoringAgent",
   // Purple Team
   THREAT_HUNTER = "ThreatHunterAgent",
   INCIDENT_RESPONSE = "IncidentResponseAgent",
   POSTURE_ASSESSMENT = "PostureAssessmentAgent",
-  THREAT_INTELLIGENCE = "ThreatIntelligenceAgent"
+  THREAT_INTELLIGENCE = "ThreatIntelligenceAgent",
+  ADAPTATION = "AdaptationAgent"
 }
 
 // Event Types Enum
@@ -505,7 +623,17 @@ export enum EventType {
   DETECTION_GAP_FOUND = "DETECTION_GAP_FOUND",
   THREAT_INTEL_REPORT = "THREAT_INTEL_REPORT",
   IOC_CORRELATED = "IOC_CORRELATED",
-  MITRE_MAPPING_COMPLETE = "MITRE_MAPPING_COMPLETE"
+  MITRE_MAPPING_COMPLETE = "MITRE_MAPPING_COMPLETE",
+  // Extended Swarm Events
+  RECON_SCAN_COMPLETE = "RECON_SCAN_COMPLETE",
+  PERSISTENCE_ACHIEVED = "PERSISTENCE_ACHIEVED",
+  PERSISTENCE_DETECTED = "PERSISTENCE_DETECTED",
+  FORENSIC_ANALYSIS_COMPLETE = "FORENSIC_ANALYSIS_COMPLETE",
+  RECOVERY_COMPLETE = "RECOVERY_COMPLETE",
+  RECOVERY_FAILED = "RECOVERY_FAILED",
+  ADAPTATION_INSIGHT = "ADAPTATION_INSIGHT",
+  STRATEGY_OPTIMIZED = "STRATEGY_OPTIMIZED",
+  SWARM_ANOMALY = "SWARM_ANOMALY"
 }
 
 // Logic Pipe Rules
@@ -524,7 +652,14 @@ export enum LogicPipeRule {
   PURPLE_HUNT_ON_INTRUSION = "PURPLE_HUNT_ON_INTRUSION",
   PURPLE_INCIDENT_ON_HUNT_FINDING = "PURPLE_INCIDENT_ON_HUNT_FINDING",
   PURPLE_POSTURE_ON_DEFENSE = "PURPLE_POSTURE_ON_DEFENSE",
-  PURPLE_INTEL_ON_ADAPTATION = "PURPLE_INTEL_ON_ADAPTATION"
+  PURPLE_INTEL_ON_ADAPTATION = "PURPLE_INTEL_ON_ADAPTATION",
+  // Extended Swarm Rules
+  RECON_ENRICHES_OSINT = "RECON_ENRICHES_OSINT",
+  PERSISTENCE_TRIGGERS_FORENSICS = "PERSISTENCE_TRIGGERS_FORENSICS",
+  FORENSIC_TRIGGERS_RECOVERY = "FORENSIC_TRIGGERS_RECOVERY",
+  RECOVERY_TRIGGERS_ADAPTATION = "RECOVERY_TRIGGERS_ADAPTATION",
+  ADAPTATION_ENRICHES_BLUE = "ADAPTATION_ENRICHES_BLUE",
+  SWARM_ANOMALY_TRIGGERS_HEAL = "SWARM_ANOMALY_TRIGGERS_HEAL"
 }
 
 // Configuration Types

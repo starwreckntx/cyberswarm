@@ -136,6 +136,44 @@ export class LogicPipe {
         createdTasks.push(...tasks);
       }
 
+      // === Extended Swarm Rules ===
+
+      // Rule: Recon data → enriches OSINT and Discovery targeting
+      if (event.eventType === EventType.RECON_SCAN_COMPLETE) {
+        const tasks = await this.applyReconEnrichesOSINT(event);
+        createdTasks.push(...tasks);
+      }
+
+      // Rule: Persistence achieved → triggers Forensics + Threat Hunt + AI Monitoring
+      if (event.eventType === EventType.PERSISTENCE_ACHIEVED) {
+        const tasks = await this.applyPersistenceTriggersForensics(event);
+        createdTasks.push(...tasks);
+      }
+
+      // Rule: Forensic analysis complete → triggers Recovery + Containment
+      if (event.eventType === EventType.FORENSIC_ANALYSIS_COMPLETE) {
+        const tasks = await this.applyForensicTriggersRecovery(event);
+        createdTasks.push(...tasks);
+      }
+
+      // Rule: Recovery complete → triggers Adaptation for strategy updates
+      if (event.eventType === EventType.RECOVERY_COMPLETE) {
+        const tasks = await this.applyRecoveryTriggersAdaptation(event);
+        createdTasks.push(...tasks);
+      }
+
+      // Rule: Adaptation insight → enriches all blue agents and AI Monitoring
+      if (event.eventType === EventType.ADAPTATION_INSIGHT || event.eventType === EventType.STRATEGY_OPTIMIZED) {
+        const tasks = await this.applyAdaptationEnrichesBlue(event);
+        createdTasks.push(...tasks);
+      }
+
+      // Rule: Swarm anomaly → triggers Recovery + Adaptation (self-healing)
+      if (event.eventType === EventType.SWARM_ANOMALY) {
+        const tasks = await this.applySwarmAnomalyTriggersHeal(event);
+        createdTasks.push(...tasks);
+      }
+
       // Log execution
       const execution: LogicPipeExecution = {
         id: uuidv4(),
@@ -1010,6 +1048,356 @@ export class LogicPipe {
     return tasks;
   }
 
+  // === Extended Swarm Rules ===
+
+  /**
+   * Rule: Recon scan complete → enriches OSINT and Discovery targeting
+   */
+  private async applyReconEnrichesOSINT(event: CyberEvent): Promise<Task[]> {
+    const tasks: Task[] = [];
+    const reconData = event.payload;
+    const target = event.target;
+
+    // Feed recon data into OSINT for enrichment
+    const osintTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-recon-osint`,
+      agentType: 'OSINTAgent',
+      taskName: 'domain_analysis',
+      target,
+      details: {
+        reconData,
+        services_found: reconData.services_found,
+        triggeredBy: event.id,
+        reason: 'recon_enriches_osint',
+      },
+      status: "PENDING",
+      priority: 7,
+      createdAt: new Date(),
+    };
+    tasks.push(osintTask);
+
+    // Feed into Discovery for targeted deep scan
+    const discoveryTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-recon-discovery`,
+      agentType: 'DiscoveryAgent',
+      taskName: 'targeted_scan',
+      target,
+      details: {
+        reconData,
+        hosts_discovered: reconData.hosts_discovered,
+        triggeredBy: event.id,
+        reason: 'recon_enriches_discovery',
+      },
+      status: "PENDING",
+      priority: 6,
+      createdAt: new Date(),
+    };
+    tasks.push(discoveryTask);
+
+    logger.debug(`Rule applied: RECON_ENRICHES_OSINT`, {
+      triggerEvent: event.eventType,
+      tasksCreated: tasks.length,
+    });
+
+    return tasks;
+  }
+
+  /**
+   * Rule: Persistence achieved → triggers Forensics + Threat Hunt + AI Monitoring
+   */
+  private async applyPersistenceTriggersForensics(event: CyberEvent): Promise<Task[]> {
+    const tasks: Task[] = [];
+    const persistenceData = event.payload;
+    const target = event.target;
+
+    // Forensics: Analyze the persistence mechanism
+    const forensicsTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-persist-forensics`,
+      agentType: 'ForensicsAgent',
+      taskName: 'investigate_files',
+      target,
+      details: {
+        persistenceData,
+        artifacts: persistenceData.artifacts_created,
+        triggeredBy: event.id,
+        reason: 'persistence_forensic_investigation',
+      },
+      status: "PENDING",
+      priority: 9,
+      createdAt: new Date(),
+    };
+    tasks.push(forensicsTask);
+
+    // Threat Hunt: Search for related persistence indicators
+    const huntTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-persist-hunt`,
+      agentType: 'ThreatHunterAgent',
+      taskName: 'hunt_ttp',
+      target,
+      details: {
+        persistenceData,
+        mitre_techniques: persistenceData.mitre_techniques,
+        triggeredBy: event.id,
+        reason: 'hunt_persistence_ttps',
+      },
+      status: "PENDING",
+      priority: 8,
+      createdAt: new Date(),
+    };
+    tasks.push(huntTask);
+
+    // AI Monitoring: Check for adversarial manipulation
+    const aiTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-persist-ai`,
+      agentType: 'AIMonitoringAgent',
+      taskName: 'monitor_reasoning_chain',
+      target,
+      details: {
+        persistenceData,
+        triggeredBy: event.id,
+        reason: 'persistence_ai_verification',
+      },
+      status: "PENDING",
+      priority: 6,
+      createdAt: new Date(),
+    };
+    tasks.push(aiTask);
+
+    logger.debug(`Rule applied: PERSISTENCE_TRIGGERS_FORENSICS`, {
+      triggerEvent: event.eventType,
+      method: persistenceData.method,
+      tasksCreated: tasks.length,
+    });
+
+    return tasks;
+  }
+
+  /**
+   * Rule: Forensic analysis complete → triggers Recovery + Containment
+   */
+  private async applyForensicTriggersRecovery(event: CyberEvent): Promise<Task[]> {
+    const tasks: Task[] = [];
+    const forensicData = event.payload;
+    const target = event.target;
+
+    // Recovery: Restore affected systems
+    const recoveryTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-forensic-recovery`,
+      agentType: 'RecoveryAgent',
+      taskName: 'verify_integrity',
+      target,
+      details: {
+        forensicData,
+        iocs_discovered: forensicData.iocs_discovered,
+        root_cause: forensicData.root_cause,
+        triggeredBy: event.id,
+        reason: 'post_forensic_recovery',
+      },
+      status: "PENDING",
+      priority: 8,
+      createdAt: new Date(),
+    };
+    tasks.push(recoveryTask);
+
+    // If IOCs found, trigger containment
+    if (forensicData.iocs_discovered?.length > 0) {
+      const containTask: Task = {
+        id: uuidv4(),
+        taskId: `task-${Date.now()}-forensic-contain`,
+        agentType: 'ContainmentAgent',
+        taskName: 'block_ip_domain',
+        target,
+        details: {
+          iocs: forensicData.iocs_discovered,
+          triggeredBy: event.id,
+          reason: 'forensic_ioc_containment',
+        },
+        status: "PENDING",
+        priority: 9,
+        createdAt: new Date(),
+      };
+      tasks.push(containTask);
+    }
+
+    logger.debug(`Rule applied: FORENSIC_TRIGGERS_RECOVERY`, {
+      triggerEvent: event.eventType,
+      iocs: forensicData.iocs_discovered?.length || 0,
+      tasksCreated: tasks.length,
+    });
+
+    return tasks;
+  }
+
+  /**
+   * Rule: Recovery complete → triggers Adaptation for strategy updates
+   */
+  private async applyRecoveryTriggersAdaptation(event: CyberEvent): Promise<Task[]> {
+    const tasks: Task[] = [];
+    const recoveryData = event.payload;
+    const target = event.target;
+
+    // Adaptation: Learn from the incident and update strategies
+    const adaptTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-recovery-adapt`,
+      agentType: 'AdaptationAgent',
+      taskName: 'learn_from_incident',
+      target,
+      details: {
+        recoveryData,
+        systems_restored: recoveryData.systems_restored,
+        triggeredBy: event.id,
+        reason: 'post_recovery_adaptation',
+      },
+      status: "PENDING",
+      priority: 6,
+      createdAt: new Date(),
+    };
+    tasks.push(adaptTask);
+
+    // Also trigger posture assessment post-recovery
+    const postureTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-recovery-posture`,
+      agentType: 'PostureAssessmentAgent',
+      taskName: 'assess_posture',
+      target,
+      details: {
+        recoveryData,
+        triggeredBy: event.id,
+        reason: 'post_recovery_posture_check',
+      },
+      status: "PENDING",
+      priority: 5,
+      createdAt: new Date(),
+    };
+    tasks.push(postureTask);
+
+    logger.debug(`Rule applied: RECOVERY_TRIGGERS_ADAPTATION`, {
+      triggerEvent: event.eventType,
+      systems_restored: recoveryData.systems_restored?.length || 0,
+      tasksCreated: tasks.length,
+    });
+
+    return tasks;
+  }
+
+  /**
+   * Rule: Adaptation insight → enriches all blue agents and AI Monitoring
+   */
+  private async applyAdaptationEnrichesBlue(event: CyberEvent): Promise<Task[]> {
+    const tasks: Task[] = [];
+    const adaptationData = event.payload;
+    const target = event.target;
+
+    // AI Monitoring: Update monitoring with new insights
+    const aiTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-adapt-ai`,
+      agentType: 'AIMonitoringAgent',
+      taskName: 'prompt_sanity_check',
+      target,
+      details: {
+        adaptationData,
+        strategy_updates: adaptationData.strategy_updates,
+        triggeredBy: event.id,
+        reason: 'adaptation_enriches_monitoring',
+      },
+      status: "PENDING",
+      priority: 5,
+      createdAt: new Date(),
+    };
+    tasks.push(aiTask);
+
+    // Log Analysis: Update detection patterns
+    const logTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-adapt-log`,
+      agentType: 'LogAnalysisAgent',
+      taskName: 'log_anomaly_detection',
+      target,
+      details: {
+        detection_improvements: adaptationData.detection_improvements,
+        triggeredBy: event.id,
+        reason: 'adaptation_enriches_detection',
+      },
+      status: "PENDING",
+      priority: 4,
+      createdAt: new Date(),
+    };
+    tasks.push(logTask);
+
+    logger.debug(`Rule applied: ADAPTATION_ENRICHES_BLUE`, {
+      triggerEvent: event.eventType,
+      updates: adaptationData.strategy_updates?.length || 0,
+      tasksCreated: tasks.length,
+    });
+
+    return tasks;
+  }
+
+  /**
+   * Rule: Swarm anomaly → triggers Recovery + Adaptation (self-healing)
+   */
+  private async applySwarmAnomalyTriggersHeal(event: CyberEvent): Promise<Task[]> {
+    const tasks: Task[] = [];
+    const anomalyData = event.payload;
+    const target = event.target;
+
+    // Recovery: Attempt to heal failed/degraded agents
+    const recoveryTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-swarm-recover`,
+      agentType: 'RecoveryAgent',
+      taskName: 'rebuild_service',
+      target,
+      details: {
+        anomalyData,
+        agents_failed: anomalyData.agents_failed,
+        anomalies: anomalyData.anomalies,
+        triggeredBy: event.id,
+        reason: 'swarm_self_healing',
+      },
+      status: "PENDING",
+      priority: 10,
+      createdAt: new Date(),
+    };
+    tasks.push(recoveryTask);
+
+    // Adaptation: Learn from the swarm failure
+    const adaptTask: Task = {
+      id: uuidv4(),
+      taskId: `task-${Date.now()}-swarm-adapt`,
+      agentType: 'AdaptationAgent',
+      taskName: 'optimize_strategy',
+      target,
+      details: {
+        anomalyData,
+        triggeredBy: event.id,
+        reason: 'swarm_anomaly_strategy_update',
+      },
+      status: "PENDING",
+      priority: 9,
+      createdAt: new Date(),
+    };
+    tasks.push(adaptTask);
+
+    logger.debug(`Rule applied: SWARM_ANOMALY_TRIGGERS_HEAL`, {
+      triggerEvent: event.eventType,
+      anomalies: anomalyData.anomalies?.length || 0,
+      overall_status: anomalyData.overall_status,
+      tasksCreated: tasks.length,
+    });
+
+    return tasks;
+  }
+
   /**
    * Determine which rule applies to an event type
    */
@@ -1040,6 +1428,19 @@ export class LogicPipe {
         return LogicPipeRule.LOG_ANOMALY_TRIGGERS_HUNT;
       case EventType.AI_REASONING_ALERT:
         return LogicPipeRule.AI_MONITORS_REASONING;
+      case EventType.RECON_SCAN_COMPLETE:
+        return LogicPipeRule.RECON_ENRICHES_OSINT;
+      case EventType.PERSISTENCE_ACHIEVED:
+        return LogicPipeRule.PERSISTENCE_TRIGGERS_FORENSICS;
+      case EventType.FORENSIC_ANALYSIS_COMPLETE:
+        return LogicPipeRule.FORENSIC_TRIGGERS_RECOVERY;
+      case EventType.RECOVERY_COMPLETE:
+        return LogicPipeRule.RECOVERY_TRIGGERS_ADAPTATION;
+      case EventType.ADAPTATION_INSIGHT:
+      case EventType.STRATEGY_OPTIMIZED:
+        return LogicPipeRule.ADAPTATION_ENRICHES_BLUE;
+      case EventType.SWARM_ANOMALY:
+        return LogicPipeRule.SWARM_ANOMALY_TRIGGERS_HEAL;
       default:
         return 'NO_RULE';
     }
@@ -1099,6 +1500,24 @@ export class LogicPipe {
         ).length,
         [LogicPipeRule.AI_MONITORS_REASONING]: this.executionHistory.filter(
           e => e.ruleApplied === LogicPipeRule.AI_MONITORS_REASONING
+        ).length,
+        [LogicPipeRule.RECON_ENRICHES_OSINT]: this.executionHistory.filter(
+          e => e.ruleApplied === LogicPipeRule.RECON_ENRICHES_OSINT
+        ).length,
+        [LogicPipeRule.PERSISTENCE_TRIGGERS_FORENSICS]: this.executionHistory.filter(
+          e => e.ruleApplied === LogicPipeRule.PERSISTENCE_TRIGGERS_FORENSICS
+        ).length,
+        [LogicPipeRule.FORENSIC_TRIGGERS_RECOVERY]: this.executionHistory.filter(
+          e => e.ruleApplied === LogicPipeRule.FORENSIC_TRIGGERS_RECOVERY
+        ).length,
+        [LogicPipeRule.RECOVERY_TRIGGERS_ADAPTATION]: this.executionHistory.filter(
+          e => e.ruleApplied === LogicPipeRule.RECOVERY_TRIGGERS_ADAPTATION
+        ).length,
+        [LogicPipeRule.ADAPTATION_ENRICHES_BLUE]: this.executionHistory.filter(
+          e => e.ruleApplied === LogicPipeRule.ADAPTATION_ENRICHES_BLUE
+        ).length,
+        [LogicPipeRule.SWARM_ANOMALY_TRIGGERS_HEAL]: this.executionHistory.filter(
+          e => e.ruleApplied === LogicPipeRule.SWARM_ANOMALY_TRIGGERS_HEAL
         ).length,
       },
     };

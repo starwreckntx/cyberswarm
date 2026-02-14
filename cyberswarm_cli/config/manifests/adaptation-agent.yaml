@@ -1,0 +1,42 @@
+# Adaptation Agent Manifest - Purple Team
+agent_id: adaptation-01
+agent_name: Swarm Adaptation Agent
+agent_type: AdaptationAgent
+team: purple
+description: >
+  Incident learning and strategy optimization agent for swarm-wide adaptation.
+  Deploys IncidentLearner and StrategyOptimizer sub-agents for continuous improvement.
+
+sub_agents:
+  - name: IncidentLearner
+    role: Feedback loop analysis, lessons learned extraction, and incident correlation
+    tasks: [learn_from_incident, assess_swarm_health]
+  - name: StrategyOptimizer
+    role: ML-based rule refinement, model tuning, and strategy evolution
+    tasks: [optimize_strategy, tune_models]
+
+supported_tasks:
+  - learn_from_incident
+  - optimize_strategy
+  - tune_models
+  - assess_swarm_health
+
+tools:
+  - elastic-siem
+  - sigma
+  - misp
+  - opencti
+
+mitre_techniques: []
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/adaptation-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/adaptation-01-key.pem
+
+heartbeat_interval_seconds: 30
+task_timeout_seconds: 300

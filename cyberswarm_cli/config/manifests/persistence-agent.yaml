@@ -1,0 +1,49 @@
+# Persistence Agent Manifest - Red Team
+agent_id: persistence-01
+agent_name: Persistence Agent
+agent_type: PersistenceAgent
+team: red
+description: >
+  Post-exploitation persistence agent for maintaining access.
+  Deploys ImplantDeployer and EvasionTuner sub-agents for resilient access.
+
+sub_agents:
+  - name: ImplantDeployer
+    role: Deploy persistent payloads via backdoors, scheduled tasks, registry keys
+    tasks: [deploy_implant, establish_persistence, validate_persistence]
+  - name: EvasionTuner
+    role: Anti-forensic techniques, obfuscation, and detection evasion
+    tasks: [tune_evasion]
+
+supported_tasks:
+  - deploy_implant
+  - establish_persistence
+  - tune_evasion
+  - validate_persistence
+
+tools:
+  - cobalt-strike
+  - sliver
+  - msfvenom
+  - metasploit
+  - mimikatz
+
+mitre_techniques:
+  - T1547   # Boot or Logon Autostart Execution
+  - T1053   # Scheduled Task/Job
+  - T1543   # Create or Modify System Process
+  - T1027   # Obfuscated Files or Information
+  - T1070   # Indicator Removal
+  - T1562   # Impair Defenses
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/persistence-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/persistence-01-key.pem
+
+heartbeat_interval_seconds: 15
+task_timeout_seconds: 240
