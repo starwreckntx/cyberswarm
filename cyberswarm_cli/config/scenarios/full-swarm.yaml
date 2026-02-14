@@ -1,0 +1,187 @@
+
+# Full Swarm Scenario - All 19 Agents Active
+# Complete red/blue/purple team simulation with full attack chain,
+# persistence, forensics, recovery, adaptation, and self-healing
+
+name: Full Swarm Exercise
+description: >
+  Comprehensive cybersecurity simulation deploying all 19 agents (7 red,
+  7 blue, 5 purple) with sub-agent specialization. Exercises the complete
+  attack lifecycle from OSINT and recon through exploitation and persistence,
+  with concurrent defensive monitoring, forensics, containment, recovery,
+  incident response, threat hunting, and security posture assessment.
+  AI monitoring oversees reasoning chains. AdaptationAgent enables
+  swarm-wide self-healing and continuous strategy evolution.
+target: 192.168.1.0/24
+duration: 1200000  # 20 minutes
+
+initialTasks:
+  # === Phase 1: Reconnaissance & Baseline (Red + Blue) ===
+
+  # Blue Team: Establish monitoring baseline
+  - agentType: NetworkMonitorAgent
+    taskName: monitor_traffic
+    priority: 10
+    details:
+      phase: baseline
+      description: Establish network traffic baseline before offensive operations
+
+  # Blue Team: Start log collection
+  - agentType: LogAnalysisAgent
+    taskName: log_collection
+    priority: 10
+    details:
+      phase: baseline
+      sources: [syslog, windows-events, firewall, ids, agent-logs]
+
+  # Blue Team: AI monitoring of all agent reasoning
+  - agentType: AIMonitoringAgent
+    taskName: monitor_reasoning_chain
+    priority: 9
+    details:
+      phase: continuous
+      description: Monitor all agent AI reasoning chains for integrity
+
+  # Blue Team: Baseline integrity verification
+  - agentType: RecoveryAgent
+    taskName: verify_integrity
+    priority: 8
+    details:
+      phase: baseline
+      description: Establish known-good baseline for post-incident comparison
+
+  # Red Team: OSINT gathering
+  - agentType: OSINTAgent
+    taskName: osint_collection
+    priority: 9
+    details:
+      phase: reconnaissance
+      collection_type: domain_analysis
+
+  # Red Team: Recon scanning (NetworkScanner + WebCrawler sub-agents)
+  - agentType: ReconAgent
+    taskName: footprint_target
+    priority: 9
+    details:
+      phase: reconnaissance
+      description: Full target footprinting with both sub-agents
+
+  # Red Team: Network discovery
+  - agentType: DiscoveryAgent
+    taskName: network_scan
+    priority: 8
+    details:
+      phase: reconnaissance
+      scan_type: comprehensive
+
+  # === Phase 2: Assessment & Threat Intel (Purple) ===
+
+  # Purple Team: Initial posture assessment
+  - agentType: PostureAssessmentAgent
+    taskName: assess_posture
+    priority: 7
+    details:
+      phase: assessment
+      description: Baseline security posture before offensive operations
+
+  # Purple Team: Correlate existing threat intelligence
+  - agentType: ThreatIntelligenceAgent
+    taskName: correlate_iocs
+    priority: 7
+    details:
+      phase: intelligence
+      description: Cross-reference known IOCs with environment
+
+  # Purple Team: Proactive threat hunting
+  - agentType: ThreatHunterAgent
+    taskName: hunt_anomaly
+    priority: 7
+    details:
+      phase: hunting
+      description: Proactive anomaly hunting before red team operations
+
+  # Purple Team: Swarm health baseline
+  - agentType: AdaptationAgent
+    taskName: assess_swarm_health
+    priority: 6
+    details:
+      phase: baseline
+      description: Baseline swarm health assessment
+
+  # === Cascading Rules Handle Remaining Phases ===
+  # Phase 3: Vulnerability Assessment → Exploitation → Persistence (via Logic Pipe)
+  #   - Recon data → enriches OSINT and Discovery targeting
+  #   - Discovery results → VulnerabilityScanner scans
+  #   - OSINT data → enriches Discovery targeting
+  #   - High severity vulns → ExploitationAgent attempts
+  #   - Access gained → PersistenceAgent deploys implants
+
+  # Phase 4: Detection, Forensics & Response (via Logic Pipe)
+  #   - Exploit success → ContainmentAgent isolates
+  #   - Persistence achieved → ForensicsAgent investigates + ThreatHunter hunts
+  #   - Intrusion detected → ContainmentAgent blocks
+  #   - Log anomalies → ThreatHunter investigates
+  #   - Hunt findings → IncidentResponse triages
+
+  # Phase 5: Recovery & Adaptation (via Logic Pipe)
+  #   - Forensic analysis → RecoveryAgent restores + ContainmentAgent blocks IOCs
+  #   - Recovery complete → AdaptationAgent learns
+  #   - Adaptation insights → enriches all blue agents
+  #   - Swarm anomaly → RecoveryAgent + AdaptationAgent self-heal
+
+  # Phase 6: Strategy Evolution (via Logic Pipe)
+  #   - Blue defense → Red adapts strategy
+  #   - Attack adaptation → ThreatIntel correlates
+  #   - Incident resolved → PostureAssessment evaluates
+
+parameters:
+  scanDepth: comprehensive
+  aggressiveness: high
+  stealthMode: false
+  focusDefense: true
+  enableAllAgents: true
+  enablePurpleTeam: true
+  enableOSINT: true
+  enableRecon: true
+  enableExploitation: true
+  enablePersistence: true
+  enableLogAnalysis: true
+  enableContainment: true
+  enableForensics: true
+  enableRecovery: true
+  enableAIMonitoring: true
+  enableAdaptation: true
+  enableSelfHealing: true
+  mitreMappingEnabled: true
+  incidentResponseEnabled: true
+
+teams:
+  red:
+    enabled: true
+    agents: [DiscoveryAgent, OSINTAgent, ReconAgent, VulnerabilityScannerAgent, ExploitationAgent, PersistenceAgent, StrategyAdaptationAgent]
+    objectives:
+      - Enumerate attack surface via OSINT, recon, and network scanning
+      - Identify and exploit high-severity vulnerabilities
+      - Establish and maintain persistent access
+      - Apply evasion techniques to avoid detection
+      - Adapt strategy when detected by blue team
+  blue:
+    enabled: true
+    agents: [NetworkMonitorAgent, LogAnalysisAgent, PatchManagementAgent, ContainmentAgent, ForensicsAgent, RecoveryAgent, AIMonitoringAgent]
+    objectives:
+      - Monitor network traffic for anomalies
+      - Collect and analyze logs for indicators of compromise
+      - Contain and remediate threats as they are detected
+      - Perform forensic analysis on compromised systems
+      - Recover and restore systems to known-good state
+      - Monitor AI reasoning chains for integrity
+  purple:
+    enabled: true
+    agents: [ThreatHunterAgent, IncidentResponseAgent, PostureAssessmentAgent, ThreatIntelligenceAgent, AdaptationAgent]
+    objectives:
+      - Proactively hunt for threats using hypothesis-driven investigation
+      - Respond to incidents through full IR lifecycle
+      - Assess security posture and identify coverage gaps
+      - Correlate threat intelligence and map to MITRE ATT&CK
+      - Learn from incidents and optimize swarm strategies
+      - Monitor swarm health and trigger self-healing

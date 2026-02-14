@@ -1,0 +1,30 @@
+# AI Monitoring Agent Manifest - Blue Team
+agent_id: ai-monitor-01
+agent_name: AI Monitoring Agent
+agent_type: AIMonitoringAgent
+team: blue
+description: AI reasoning chain monitor for detecting logic loops, model drift, adversarial inputs, and prompt injection attacks
+
+supported_tasks:
+  - monitor_reasoning_chain
+  - prompt_sanity_check
+  - detect_logic_loops
+
+tools:
+  - elastic-siem
+  - sigma
+
+mitre_techniques:
+  - T1059  # Command and Scripting Interpreter (monitoring)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/ai-monitor-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/ai-monitor-01-key.pem
+
+heartbeat_interval_seconds: 15
+task_timeout_seconds: 120

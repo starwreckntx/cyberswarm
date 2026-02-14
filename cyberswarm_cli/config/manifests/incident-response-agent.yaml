@@ -1,0 +1,37 @@
+# Incident Response Agent Manifest - Purple Team
+agent_id: ir-01
+agent_name: Incident Response Agent
+agent_type: IncidentResponseAgent
+team: purple
+description: Full lifecycle incident response agent handling triage, containment, eradication, and recovery
+
+supported_tasks:
+  - triage_incident
+  - contain_incident
+  - eradicate_threat
+  - recover_systems
+
+tools:
+  - thehive
+  - cortex
+  - grr
+  - velociraptor
+  - volatility
+  - autopsy
+
+mitre_techniques:
+  - T1003  # OS Credential Dumping (response)
+  - T1055  # Process Injection (response)
+  - T1547  # Boot or Logon Autostart Execution (response)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/ir-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/ir-01-key.pem
+
+heartbeat_interval_seconds: 15
+task_timeout_seconds: 600

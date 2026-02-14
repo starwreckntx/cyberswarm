@@ -1,0 +1,95 @@
+
+# CyberSwarm MCP Orchestrator Server Configuration
+# Central configuration for the Multi-agent Command & Control Platform
+
+server:
+  agent_listener:
+    host: 0.0.0.0
+    port: 8443
+    protocol: https
+  api:
+    host: 0.0.0.0
+    port: 8080
+    protocol: http
+  security:
+    mTLS_enabled: true
+    ca_cert_path: /etc/cyberswarm/certs/ca.pem
+    server_cert_path: /etc/cyberswarm/certs/server.pem
+    server_key_path: /etc/cyberswarm/certs/server-key.pem
+    crl_path: /etc/cyberswarm/certs/crl.pem
+
+knowledge_base:
+  type: elasticsearch
+  host: localhost
+  port: 9200
+  index_prefix: cyberswarm
+  credentials_secret_name: cyberswarm-es-creds
+
+logic_pipe:
+  tempo_control:
+    red_team_max_tasks_per_minute: 10
+    blue_team_max_tasks_per_minute: 20
+    purple_team_max_tasks_per_minute: 15
+    target_cooldown_seconds: 30
+  high_impact_confidence_threshold: 0.75
+  max_concurrent_rules: 5
+  event_queue_size: 1000
+
+agent_management:
+  heartbeat_timeout_seconds: 60
+  max_agents: 20
+  auto_restart_failed: true
+  task_timeout_seconds: 300
+
+teams:
+  red:
+    agents:
+      - DiscoveryAgent
+      - OSINTAgent
+      - ReconAgent
+      - VulnerabilityScannerAgent
+      - ExploitationAgent
+      - PersistenceAgent
+      - StrategyAdaptationAgent
+    max_concurrent: 7
+    tempo: aggressive
+  blue:
+    agents:
+      - NetworkMonitorAgent
+      - LogAnalysisAgent
+      - PatchManagementAgent
+      - ContainmentAgent
+      - ForensicsAgent
+      - RecoveryAgent
+      - AIMonitoringAgent
+    max_concurrent: 7
+    tempo: reactive
+  purple:
+    agents:
+      - ThreatHunterAgent
+      - IncidentResponseAgent
+      - PostureAssessmentAgent
+      - ThreatIntelligenceAgent
+      - AdaptationAgent
+    max_concurrent: 5
+    tempo: balanced
+
+api_endpoints:
+  gemini: https://generativelanguage.googleapis.com/v1beta
+  misp: http://localhost:8082/api
+  opencti: http://localhost:8083/graphql
+  thehive: http://localhost:9000/api
+  cortex: http://localhost:9001/api
+  elastic: http://localhost:9200
+  caldera: http://localhost:8888/api
+
+logging:
+  level: info
+  structured: true
+  output:
+    - console
+    - file
+  file_path: /var/log/cyberswarm/orchestrator.log
+  rotation:
+    max_size_mb: 100
+    max_files: 10

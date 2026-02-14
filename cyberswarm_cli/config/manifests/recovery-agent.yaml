@@ -1,0 +1,41 @@
+# Recovery Agent Manifest - Blue Team
+agent_id: recovery-01
+agent_name: System Recovery Agent
+agent_type: RecoveryAgent
+team: blue
+description: >
+  System restoration and integrity verification agent for self-healing.
+  Deploys BackupRestorer and IntegrityVerifier sub-agents for autonomous recovery.
+
+sub_agents:
+  - name: BackupRestorer
+    role: Automated snapshot recovery, system rollback, and service rebuild
+    tasks: [restore_backup, rollback_system, rebuild_service]
+  - name: IntegrityVerifier
+    role: Checksum validation, configuration audits, and baseline comparison
+    tasks: [verify_integrity]
+
+supported_tasks:
+  - restore_backup
+  - verify_integrity
+  - rollback_system
+  - rebuild_service
+
+tools:
+  - grr
+  - velociraptor
+  - autopsy
+
+mitre_techniques: []
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/recovery-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/recovery-01-key.pem
+
+heartbeat_interval_seconds: 15
+task_timeout_seconds: 600

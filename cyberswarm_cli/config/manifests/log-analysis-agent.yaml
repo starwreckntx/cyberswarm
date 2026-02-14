@@ -1,0 +1,32 @@
+# Log Analysis Agent Manifest - Blue Team
+agent_id: log-analysis-01
+agent_name: Log Analysis Agent
+agent_type: LogAnalysisAgent
+team: blue
+description: Centralized log collection, parsing, and anomaly detection agent using SIEM and Sigma rules
+
+supported_tasks:
+  - log_collection
+  - log_parsing
+  - log_anomaly_detection
+
+tools:
+  - elastic-siem
+  - sigma
+  - osquery
+
+mitre_techniques:
+  - T1070  # Indicator Removal (detection)
+  - T1562  # Impair Defenses (detection)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/log-analysis-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/log-analysis-01-key.pem
+
+heartbeat_interval_seconds: 20
+task_timeout_seconds: 300

@@ -1,0 +1,36 @@
+# Posture Assessment Agent Manifest - Purple Team
+agent_id: posture-assess-01
+agent_name: Security Posture Assessment Agent
+agent_type: PostureAssessmentAgent
+team: purple
+description: Security posture evaluation agent for gap analysis, controls testing, MITRE coverage mapping, and scorecard generation
+
+supported_tasks:
+  - assess_posture
+  - evaluate_controls
+  - map_mitre_coverage
+  - generate_scorecard
+
+tools:
+  - nessus
+  - openvas
+  - atomic-red-team
+  - caldera
+  - suricata
+  - sigma
+  - nuclei
+
+mitre_techniques:
+  - T1595.002  # Vulnerability Scanning (assessment)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/posture-assess-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/posture-assess-01-key.pem
+
+heartbeat_interval_seconds: 30
+task_timeout_seconds: 300

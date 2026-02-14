@@ -47,15 +47,28 @@ export class SecurityToolRegistry {
    */
   getToolsForAgent(agentType: string): SecurityTool[] {
     const agentToolMap: Record<string, ToolCategory[]> = {
+      // Red Team (7)
       DiscoveryAgent: ['reconnaissance'],
+      OSINTAgent: ['reconnaissance', 'threat_intelligence'],
+      ReconAgent: ['reconnaissance', 'vulnerability_scanning'],
       VulnerabilityScannerAgent: ['vulnerability_scanning'],
-      PatchManagementAgent: ['incident_response', 'defense_evasion'],
-      NetworkMonitorAgent: ['network_monitoring', 'detection_engineering'],
+      ExploitationAgent: ['exploitation', 'post_exploitation', 'payload_generation', 'credential_access'],
+      PersistenceAgent: ['exploitation', 'post_exploitation', 'payload_generation', 'defense_evasion', 'persistence'],
       StrategyAdaptationAgent: ['exploitation', 'post_exploitation', 'defense_evasion', 'lateral_movement'],
+      // Blue Team (7)
+      NetworkMonitorAgent: ['network_monitoring', 'detection_engineering'],
+      LogAnalysisAgent: ['threat_hunting', 'network_monitoring', 'detection_engineering'],
+      PatchManagementAgent: ['incident_response', 'defense_evasion'],
+      ContainmentAgent: ['incident_response', 'network_monitoring'],
+      ForensicsAgent: ['forensics', 'threat_hunting', 'incident_response'],
+      RecoveryAgent: ['incident_response', 'forensics'],
+      AIMonitoringAgent: ['detection_engineering', 'threat_hunting'],
+      // Purple Team (5)
       ThreatHunterAgent: ['threat_hunting', 'forensics', 'detection_engineering', 'network_monitoring'],
       IncidentResponseAgent: ['incident_response', 'forensics', 'network_monitoring'],
       PostureAssessmentAgent: ['vulnerability_scanning', 'detection_engineering', 'network_monitoring'],
       ThreatIntelligenceAgent: ['threat_intelligence', 'threat_hunting'],
+      AdaptationAgent: ['detection_engineering', 'threat_hunting', 'threat_intelligence'],
     };
 
     const categories = agentToolMap[agentType] || [];

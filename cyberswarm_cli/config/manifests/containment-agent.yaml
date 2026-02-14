@@ -1,0 +1,32 @@
+# Containment Agent Manifest - Blue Team
+agent_id: containment-01
+agent_name: Containment Agent
+agent_type: ContainmentAgent
+team: blue
+description: Rapid threat containment agent for network isolation, process termination, and IP/domain blocking
+
+supported_tasks:
+  - network_isolate
+  - process_terminate
+  - block_ip_domain
+
+tools:
+  - grr
+  - velociraptor
+  - suricata
+
+mitre_techniques:
+  - T1021  # Remote Services (containment)
+  - T1071  # Application Layer Protocol (blocking)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/containment-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/containment-01-key.pem
+
+heartbeat_interval_seconds: 10
+task_timeout_seconds: 60

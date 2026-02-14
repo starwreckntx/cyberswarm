@@ -290,6 +290,120 @@ export interface MitreMapping {
   detection_status: "DETECTED" | "MISSED" | "PARTIAL";
 }
 
+// OSINT Data Payload
+export interface OSINTData {
+  target: string;
+  collection_type: "domain_analysis" | "employee_profiling" | "osint_collection" | "cert_log_analysis";
+  subdomains?: string[];
+  emails?: string[];
+  social_profiles?: string[];
+  exposed_credentials?: number;
+  public_documents?: string[];
+  infrastructure?: Record<string, any>;
+  risk_indicators?: string[];
+}
+
+// Exploitation Payload
+export interface ExploitResult {
+  exploit_id: string;
+  target_ip: string;
+  target_port: number;
+  vulnerability_used: string;
+  exploit_module: string;
+  payload_type: string;
+  access_level: "none" | "user" | "admin" | "system";
+  session_id?: string;
+  artifacts_created?: string[];
+  detection_risk: "low" | "medium" | "high";
+}
+
+// Containment Payload
+export interface ContainmentAction {
+  containment_id: string;
+  action_type: "network_isolate" | "process_terminate" | "block_ip_domain" | "disable_account";
+  target: string;
+  scope: string[];
+  success: boolean;
+  evidence_preserved: boolean;
+  side_effects?: string[];
+}
+
+// Log Analysis Payload
+export interface LogAnalysisResult {
+  analysis_id: string;
+  log_sources: string[];
+  events_analyzed: number;
+  anomalies_found: number;
+  correlated_events: Array<{
+    event_id: string;
+    source: string;
+    severity: Severity;
+    description: string;
+    timestamp: string;
+  }>;
+  patterns_detected: string[];
+  risk_assessment: string;
+}
+
+// AI Monitoring Payload
+export interface AIReasoningAlert {
+  alert_id: string;
+  monitored_component: string;
+  alert_type: "logic_loop" | "model_drift" | "adversarial_input" | "confidence_anomaly" | "prompt_injection";
+  description: string;
+  severity: Severity;
+  affected_decisions: string[];
+  recommended_action: string;
+}
+
+// Agent Manifest Types
+export interface AgentManifest {
+  agent_id: string;
+  agent_name: string;
+  agent_type: string;
+  team: "red" | "blue" | "purple";
+  supported_tasks: string[];
+  c2_server: {
+    host: string;
+    port: number;
+    protocol: string;
+  };
+  security: {
+    client_cert_path: string;
+    client_key_path: string;
+  };
+  heartbeat_interval_seconds: number;
+  task_timeout_seconds: number;
+}
+
+// MCP Server Config Types
+export interface MCPServerConfig {
+  server: {
+    agent_listener: { host: string; port: number; protocol: string };
+    security: {
+      mTLS_enabled: boolean;
+      ca_cert_path: string;
+      server_cert_path: string;
+      server_key_path: string;
+      crl_path: string;
+    };
+  };
+  knowledge_base: {
+    type: string;
+    host: string;
+    port: number;
+    credentials_secret_name: string;
+  };
+  logic_pipe: {
+    tempo_control: {
+      red_team_max_tasks_per_minute: number;
+      target_cooldown_seconds: number;
+    };
+    high_impact_confidence_threshold: number;
+  };
+  api_endpoints: Record<string, string>;
+}
+
 // Cybersecurity Event Payloads
 export interface ReconData {
   target_ip: string;
@@ -332,17 +446,143 @@ export interface AttackAdaptation {
   confidence: number;
 }
 
+// Reconnaissance Payload
+export interface ReconScanResult {
+  scan_id: string;
+  target: string;
+  scan_type: "port_scan" | "service_enum" | "web_crawl" | "footprint";
+  sub_agent: "NetworkScanner" | "WebCrawler";
+  hosts_discovered: number;
+  services_found: Array<{
+    host: string;
+    port: number;
+    service: string;
+    version?: string;
+  }>;
+  web_assets?: Array<{
+    url: string;
+    technology: string;
+    status_code: number;
+  }>;
+  vulnerabilities_hinted: string[];
+}
+
+// Persistence Payload
+export interface PersistenceResult {
+  persistence_id: string;
+  target: string;
+  method: "backdoor" | "scheduled_task" | "registry_key" | "web_shell" | "rootkit";
+  sub_agent: "ImplantDeployer" | "EvasionTuner";
+  success: boolean;
+  access_maintained: boolean;
+  evasion_techniques: string[];
+  detection_risk: "low" | "medium" | "high";
+  mitre_techniques: string[];
+  artifacts_created: string[];
+}
+
+// Forensics Payload
+export interface ForensicAnalysis {
+  analysis_id: string;
+  target: string;
+  analysis_type: "memory" | "disk" | "network" | "timeline";
+  sub_agent: "MemoryAnalyzer" | "FileInvestigator";
+  evidence_collected: Array<{
+    evidence_id: string;
+    type: string;
+    description: string;
+    hash?: string;
+    timestamp?: string;
+  }>;
+  root_cause?: string;
+  timeline: Array<{
+    timestamp: string;
+    event: string;
+    source: string;
+    significance: "low" | "medium" | "high" | "critical";
+  }>;
+  iocs_discovered: string[];
+  recommendations: string[];
+}
+
+// Recovery Payload
+export interface RecoveryResult {
+  recovery_id: string;
+  target: string;
+  action_type: "backup_restore" | "integrity_verify" | "rollback" | "rebuild";
+  sub_agent: "BackupRestorer" | "IntegrityVerifier";
+  success: boolean;
+  systems_restored: string[];
+  integrity_checks: Array<{
+    component: string;
+    status: "passed" | "failed" | "warning";
+    details?: string;
+  }>;
+  rollback_point?: string;
+  downtime_seconds: number;
+}
+
+// Adaptation Payload
+export interface AdaptationInsight {
+  insight_id: string;
+  analysis_type: "incident_learning" | "strategy_optimization" | "model_tuning";
+  sub_agent: "IncidentLearner" | "StrategyOptimizer";
+  lessons_learned: Array<{
+    category: string;
+    finding: string;
+    recommendation: string;
+    priority: "low" | "medium" | "high" | "critical";
+  }>;
+  strategy_updates: Array<{
+    rule_id: string;
+    old_value?: string;
+    new_value: string;
+    rationale: string;
+  }>;
+  detection_improvements: string[];
+  confidence_score: number;
+}
+
+// Swarm Health Status
+export interface SwarmHealthStatus {
+  swarm_id: string;
+  timestamp: Date;
+  agents_healthy: number;
+  agents_degraded: number;
+  agents_failed: number;
+  anomalies: Array<{
+    agent_id: string;
+    anomaly_type: "logic_loop" | "timeout" | "crash" | "drift" | "resource_exhaustion";
+    severity: Severity;
+    description: string;
+  }>;
+  overall_status: "healthy" | "degraded" | "critical";
+}
+
 // Agent Types Enum
 export enum AgentType {
+  // Red Team
   DISCOVERY = "DiscoveryAgent",
+  OSINT = "OSINTAgent",
+  RECON = "ReconAgent",
   VULNERABILITY_SCANNER = "VulnerabilityScannerAgent",
-  PATCH_MANAGEMENT = "PatchManagementAgent",
-  NETWORK_MONITOR = "NetworkMonitorAgent",
+  EXPLOITATION = "ExploitationAgent",
+  PERSISTENCE = "PersistenceAgent",
   STRATEGY_ADAPTATION = "StrategyAdaptationAgent",
+  // Blue Team
+  NETWORK_MONITOR = "NetworkMonitorAgent",
+  LOG_ANALYSIS = "LogAnalysisAgent",
+  PATCH_MANAGEMENT = "PatchManagementAgent",
+  CONTAINMENT = "ContainmentAgent",
+  FORENSICS = "ForensicsAgent",
+  RECOVERY = "RecoveryAgent",
+  AI_MONITORING = "AIMonitoringAgent",
+  // Purple Team
   THREAT_HUNTER = "ThreatHunterAgent",
   INCIDENT_RESPONSE = "IncidentResponseAgent",
   POSTURE_ASSESSMENT = "PostureAssessmentAgent",
-  THREAT_INTELLIGENCE = "ThreatIntelligenceAgent"
+  THREAT_INTELLIGENCE = "ThreatIntelligenceAgent",
+  ADAPTATION = "AdaptationAgent"
 }
 
 // Event Types Enum
@@ -359,6 +599,19 @@ export enum EventType {
   MONITORING_COMPLETE = "MONITORING_COMPLETE",
   DEFENSE_ANALYSIS_COMPLETE = "DEFENSE_ANALYSIS_COMPLETE",
   TASK_ERROR = "TASK_ERROR",
+  // Extended Red Team Events
+  OSINT_DATA_COLLECTED = "OSINT_DATA_COLLECTED",
+  ACCESS_GAINED = "ACCESS_GAINED",
+  DATA_EXFILTRATED = "DATA_EXFILTRATED",
+  EXPLOIT_FAILED = "EXPLOIT_FAILED",
+  PAYLOAD_DELIVERED = "PAYLOAD_DELIVERED",
+  // Extended Blue Team Events
+  LOG_ANOMALY_DETECTED = "LOG_ANOMALY_DETECTED",
+  CONTAINMENT_ACTION = "CONTAINMENT_ACTION",
+  SYSTEM_ISOLATED = "SYSTEM_ISOLATED",
+  PROCESS_TERMINATED = "PROCESS_TERMINATED",
+  AI_REASONING_ALERT = "AI_REASONING_ALERT",
+  THREAT_HUNT_RESULT = "THREAT_HUNT_RESULT",
   // Purple Team Events
   THREAT_HUNT_FINDING = "THREAT_HUNT_FINDING",
   THREAT_HUNT_COMPLETE = "THREAT_HUNT_COMPLETE",
@@ -370,7 +623,17 @@ export enum EventType {
   DETECTION_GAP_FOUND = "DETECTION_GAP_FOUND",
   THREAT_INTEL_REPORT = "THREAT_INTEL_REPORT",
   IOC_CORRELATED = "IOC_CORRELATED",
-  MITRE_MAPPING_COMPLETE = "MITRE_MAPPING_COMPLETE"
+  MITRE_MAPPING_COMPLETE = "MITRE_MAPPING_COMPLETE",
+  // Extended Swarm Events
+  RECON_SCAN_COMPLETE = "RECON_SCAN_COMPLETE",
+  PERSISTENCE_ACHIEVED = "PERSISTENCE_ACHIEVED",
+  PERSISTENCE_DETECTED = "PERSISTENCE_DETECTED",
+  FORENSIC_ANALYSIS_COMPLETE = "FORENSIC_ANALYSIS_COMPLETE",
+  RECOVERY_COMPLETE = "RECOVERY_COMPLETE",
+  RECOVERY_FAILED = "RECOVERY_FAILED",
+  ADAPTATION_INSIGHT = "ADAPTATION_INSIGHT",
+  STRATEGY_OPTIMIZED = "STRATEGY_OPTIMIZED",
+  SWARM_ANOMALY = "SWARM_ANOMALY"
 }
 
 // Logic Pipe Rules
@@ -378,11 +641,25 @@ export enum LogicPipeRule {
   RED_DISCOVERS_BLUE_REACTS = "RED_DISCOVERS_BLUE_REACTS",
   BLUE_DETECTS_RED_ADAPTS = "BLUE_DETECTS_RED_ADAPTS",
   BLUE_DEFENDS_RED_REEVALUATES = "BLUE_DEFENDS_RED_REEVALUATES",
+  // Extended Rules
+  OSINT_ENRICHES_DISCOVERY = "OSINT_ENRICHES_DISCOVERY",
+  VULN_TRIGGERS_EXPLOIT = "VULN_TRIGGERS_EXPLOIT",
+  EXPLOIT_TRIGGERS_CONTAINMENT = "EXPLOIT_TRIGGERS_CONTAINMENT",
+  LOG_ANOMALY_TRIGGERS_HUNT = "LOG_ANOMALY_TRIGGERS_HUNT",
+  INTRUSION_TRIGGERS_CONTAINMENT = "INTRUSION_TRIGGERS_CONTAINMENT",
+  AI_MONITORS_REASONING = "AI_MONITORS_REASONING",
   // Purple Team Rules
   PURPLE_HUNT_ON_INTRUSION = "PURPLE_HUNT_ON_INTRUSION",
   PURPLE_INCIDENT_ON_HUNT_FINDING = "PURPLE_INCIDENT_ON_HUNT_FINDING",
   PURPLE_POSTURE_ON_DEFENSE = "PURPLE_POSTURE_ON_DEFENSE",
-  PURPLE_INTEL_ON_ADAPTATION = "PURPLE_INTEL_ON_ADAPTATION"
+  PURPLE_INTEL_ON_ADAPTATION = "PURPLE_INTEL_ON_ADAPTATION",
+  // Extended Swarm Rules
+  RECON_ENRICHES_OSINT = "RECON_ENRICHES_OSINT",
+  PERSISTENCE_TRIGGERS_FORENSICS = "PERSISTENCE_TRIGGERS_FORENSICS",
+  FORENSIC_TRIGGERS_RECOVERY = "FORENSIC_TRIGGERS_RECOVERY",
+  RECOVERY_TRIGGERS_ADAPTATION = "RECOVERY_TRIGGERS_ADAPTATION",
+  ADAPTATION_ENRICHES_BLUE = "ADAPTATION_ENRICHES_BLUE",
+  SWARM_ANOMALY_TRIGGERS_HEAL = "SWARM_ANOMALY_TRIGGERS_HEAL"
 }
 
 // Configuration Types

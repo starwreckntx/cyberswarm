@@ -1,0 +1,47 @@
+# Recon Agent Manifest - Red Team
+agent_id: recon-01
+agent_name: Reconnaissance Agent
+agent_type: ReconAgent
+team: red
+description: >
+  Network scanning, footprinting, and vulnerability identification agent.
+  Deploys NetworkScanner and WebCrawler sub-agents for parallel reconnaissance.
+
+sub_agents:
+  - name: NetworkScanner
+    role: Port and service enumeration via Nmap and Masscan
+    tasks: [network_scan, service_enumeration]
+  - name: WebCrawler
+    role: Web asset discovery, directory enumeration, and API detection
+    tasks: [web_crawl]
+
+supported_tasks:
+  - network_scan
+  - service_enumeration
+  - web_crawl
+  - footprint_target
+
+tools:
+  - nmap
+  - masscan
+  - amass
+  - nuclei
+
+mitre_techniques:
+  - T1046   # Network Service Discovery
+  - T1595   # Active Scanning
+  - T1590   # Gather Victim Network Information
+  - T1018   # Remote System Discovery
+  - T1593   # Search Open Websites/Domains
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/recon-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/recon-01-key.pem
+
+heartbeat_interval_seconds: 20
+task_timeout_seconds: 180
