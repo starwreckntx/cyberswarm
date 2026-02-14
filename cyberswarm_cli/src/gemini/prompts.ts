@@ -872,6 +872,285 @@ Enrich provided indicators with threat intelligence. Output JSON with:
 }
 `,
 
+  // === OSINT Agent Prompts ===
+
+  OSINT_COLLECTION: (target: string, context: any) => `
+You are a red team OSINT agent gathering open source intelligence.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Gather comprehensive OSINT. Output JSON with:
+{
+  "subdomains": ["list of discovered subdomains"],
+  "emails": ["list of discovered email addresses"],
+  "exposed_services": [{ "host": "string", "port": 0, "service": "string", "version": "string" }],
+  "infrastructure": { "hosting_provider": "string", "ip_ranges": ["list"], "technologies": ["list"], "cdn": "string" },
+  "risk_indicators": ["list of risk indicators"],
+  "attack_surface_score": 0,
+  "social_media_presence": ["list"],
+  "public_documents": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  OSINT_DOMAIN_ANALYSIS: (target: string, context: any) => `
+You are a red team OSINT agent performing deep domain analysis.
+Target Domain: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Analyze the domain. Output JSON with:
+{
+  "dns_records": [{ "type": "A", "value": "string", "ttl": 0 }],
+  "subdomains": ["list"],
+  "certificates": [{ "subject": "string", "issuer": "string", "valid_from": "string", "valid_to": "string", "san": ["list"] }],
+  "whois_info": { "registrar": "string", "creation_date": "string", "expiration_date": "string", "name_servers": ["list"] },
+  "infrastructure": { "ip_addresses": ["list"], "asn": "string", "hosting": "string" },
+  "recommendations": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  OSINT_EMPLOYEE_PROFILING: (target: string, context: any) => `
+You are a red team OSINT agent profiling employees for social engineering assessment.
+Target Organization: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Profile employees from public sources. Output JSON with:
+{
+  "employees": [{ "name": "string", "role": "string", "department": "string", "public_presence": "low" }],
+  "high_value_targets": [{ "name": "string", "role": "string", "reason": "string", "attack_vector": "string" }],
+  "email_pattern": "string",
+  "social_profiles": ["list"],
+  "phishing_vectors": [{ "vector": "string", "target_group": "string", "likelihood_of_success": "medium" }],
+  "organizational_structure": { "departments": ["list"], "key_technologies": ["list"] },
+  "confidence": 0.0
+}
+`,
+
+  // === Exploitation Agent Prompts ===
+
+  EXPLOITATION_EXECUTE: (target: string, vulnerability: any) => `
+You are a red team exploitation agent simulating an authorized penetration test.
+Target: ${target}
+Vulnerability: ${JSON.stringify(vulnerability, null, 2)}
+Simulate exploit execution. Output JSON with:
+{
+  "exploit_module": "string",
+  "target_port": 0,
+  "vulnerability": "string",
+  "payload_type": "string",
+  "evasion_techniques": ["list"],
+  "success": true,
+  "access_level": "none",
+  "session_established": false,
+  "session_id": "string",
+  "artifacts": ["list"],
+  "detection_risk": "medium",
+  "failure_reason": "string",
+  "next_steps": ["list"],
+  "recommendations": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  EXPLOITATION_PAYLOAD: (target: string, context: any) => `
+You are a red team agent generating and delivering a payload for an authorized penetration test.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Plan payload delivery. Output JSON with:
+{
+  "payload_type": "staged",
+  "delivery_method": "string",
+  "evasion_applied": ["list"],
+  "encoding": "string",
+  "delivery_success": true,
+  "callback_received": false,
+  "c2_channel": { "protocol": "string", "host": "string", "port": 0, "encryption": "string" },
+  "detection_risk": "medium",
+  "confidence": 0.0
+}
+`,
+
+  EXPLOITATION_POST_EXPLOIT: (target: string, context: any) => `
+You are a red team agent performing post-exploitation during an authorized penetration test.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Simulate post-exploitation. Output JSON with:
+{
+  "credentials_found": 0,
+  "credential_types": ["list"],
+  "lateral_paths": [{ "target": "string", "method": "string", "likelihood": "medium" }],
+  "privilege_escalated": false,
+  "escalation_method": "string",
+  "persistence_established": false,
+  "persistence_mechanisms": ["list"],
+  "data_discovered": [{ "type": "string", "location": "string", "sensitivity": "medium" }],
+  "next_targets": ["list"],
+  "detection_risk": "medium",
+  "confidence": 0.0
+}
+`,
+
+  // === Log Analysis Agent Prompts ===
+
+  LOG_ANALYSIS_COLLECT: (target: string, context: any) => `
+You are a blue team log analysis agent collecting logs from the environment.
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Simulate log collection. Output JSON with:
+{
+  "total_events": 0,
+  "log_sources": ["list of sources"],
+  "time_span": "string",
+  "event_breakdown": {},
+  "event_types": ["list"],
+  "notable_entries": [{ "source": "string", "event_id": "string", "severity": "string", "description": "string" }],
+  "collection_gaps": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  LOG_ANALYSIS_PARSE: (target: string, context: any) => `
+You are a blue team log analysis agent parsing and normalizing log events.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Parse and normalize logs. Output JSON with:
+{
+  "events_parsed": 0,
+  "normalized_format": "ECS",
+  "field_mappings": {},
+  "parsing_errors": 0,
+  "suspicious_patterns": [{ "pattern": "string", "count": 0, "severity": "string", "source": "string" }],
+  "correlated_events": [{ "event_id": "string", "source": "string", "description": "string", "related_to": "string" }],
+  "confidence": 0.0
+}
+`,
+
+  LOG_ANALYSIS_ANOMALY: (target: string, context: any) => `
+You are a blue team log analysis agent performing anomaly detection on log data.
+Target Network: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Detect anomalies in log data. Output JSON with:
+{
+  "events_analyzed": 0,
+  "log_sources": ["list"],
+  "anomalies": [{ "type": "string", "description": "string", "severity": "High", "source": "string", "event_count": 0, "time_window": "string", "evidence": ["list"] }],
+  "sigma_rule_matches": 0,
+  "correlation_chains": [{ "chain_id": "string", "events": ["list"], "kill_chain_phase": "string" }],
+  "attack_indicators": ["list"],
+  "correlated_with_known_ttps": false,
+  "threat_level": "low",
+  "recommended_actions": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  // === Containment Agent Prompts ===
+
+  CONTAINMENT_NETWORK_ISOLATE: (target: string, context: any) => `
+You are a blue team containment agent performing network isolation.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Plan and execute network isolation. Output JSON with:
+{
+  "isolation_strategy": "full_isolation",
+  "scope": { "systems": ["list"], "network_segments": ["list"], "accounts": ["list"] },
+  "business_impact": "medium",
+  "isolation_steps": [{ "action": "string", "target": "string", "command": "string", "expected_outcome": "string" }],
+  "evidence_preservation": { "memory_dump": true, "disk_image": false, "network_capture": true },
+  "evidence_preserved": true,
+  "verified": true,
+  "side_effects": ["list"],
+  "rollback_plan": "string",
+  "confidence": 0.0
+}
+`,
+
+  CONTAINMENT_PROCESS_TERMINATE: (target: string, context: any) => `
+You are a blue team containment agent terminating malicious processes.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Plan process termination. Output JSON with:
+{
+  "processes": [{ "pid": 0, "name": "string", "path": "string", "reason": "string", "parent_pid": 0 }],
+  "child_processes_killed": 0,
+  "memory_dumped": true,
+  "verified": true,
+  "no_respawn": true,
+  "persistence_check": { "registry": false, "scheduled_tasks": false, "services": false },
+  "confidence": 0.0
+}
+`,
+
+  CONTAINMENT_BLOCK_IP: (target: string, context: any) => `
+You are a blue team containment agent blocking malicious IPs and domains.
+Target: ${target}
+Context: ${JSON.stringify(context, null, 2)}
+Plan IOC blocking. Output JSON with:
+{
+  "blocked_iocs": [{ "type": "ip", "value": "string", "reason": "string" }],
+  "enforcement_points": ["list"],
+  "rules_created": [{ "enforcement_point": "string", "rule": "string", "direction": "both" }],
+  "verified": true,
+  "all_points_updated": true,
+  "false_positive_risk": "low",
+  "expiration": "72h",
+  "confidence": 0.0
+}
+`,
+
+  // === AI Monitoring Agent Prompts ===
+
+  AI_MONITOR_REASONING: (context: any) => `
+You are an AI monitoring agent analyzing reasoning chains for anomalies.
+Context: ${JSON.stringify(context, null, 2)}
+Monitor AI reasoning quality. Output JSON with:
+{
+  "chains_reviewed": 0,
+  "anomalies_detected": 0,
+  "anomaly_types": ["list"],
+  "primary_anomaly_type": "string",
+  "confidence_drift": "stable",
+  "decision_consistency": 0,
+  "affected_agents": ["list"],
+  "affected_decisions": ["list"],
+  "overall_severity": "Low",
+  "summary": "string",
+  "primary_recommendation": "string",
+  "recommendations": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  AI_MONITOR_PROMPT_CHECK: (context: any) => `
+You are an AI monitoring agent checking prompts for injection and manipulation.
+Context: ${JSON.stringify(context, null, 2)}
+Validate prompt integrity. Output JSON with:
+{
+  "prompts_checked": 0,
+  "injection_attempts": 0,
+  "injection_details": [{ "prompt_id": "string", "injection_type": "string", "severity": "string", "payload": "string" }],
+  "semantic_anomalies": 0,
+  "data_integrity": 0,
+  "affected_decisions": ["list"],
+  "confidence": 0.0
+}
+`,
+
+  AI_MONITOR_LOGIC_LOOPS: (context: any) => `
+You are an AI monitoring agent detecting logic loops in orchestrator event processing.
+Context: ${JSON.stringify(context, null, 2)}
+Detect circular event chains. Output JSON with:
+{
+  "event_chains_checked": 0,
+  "loops_detected": 0,
+  "loop_details": [{ "chain": ["list"], "frequency": 0, "duration": "string" }],
+  "affected_event_types": ["list"],
+  "resource_utilization": "normal",
+  "resource_impact": "string",
+  "longest_chain_length": 0,
+  "breaking_strategy": "string",
+  "confidence": 0.0
+}
+`,
+
   // Orchestrator Coordination Prompt
   ORCHESTRATOR_COORDINATION: (state: any) => `
 You are the orchestrator coordinating a multi-agent cybersecurity simulation.

@@ -1,0 +1,33 @@
+# Strategy Adaptation Agent Manifest - Red Team
+agent_id: strategy-01
+agent_name: Strategy Adaptation Agent
+agent_type: StrategyAdaptationAgent
+team: red
+description: AI-driven strategy adaptation agent that adjusts attack patterns based on defensive responses
+
+supported_tasks:
+  - adapt_strategy
+  - reevaluate_targets
+
+tools:
+  - metasploit
+  - cobalt-strike
+  - bloodhound
+  - impacket
+
+mitre_techniques:
+  - T1059  # Command and Scripting Interpreter
+  - T1021  # Remote Services
+  - T1055  # Process Injection
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/strategy-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/strategy-01-key.pem
+
+heartbeat_interval_seconds: 30
+task_timeout_seconds: 180

@@ -1,0 +1,33 @@
+# Network Monitor Agent Manifest - Blue Team
+agent_id: net-mon-01
+agent_name: Network Monitor Agent
+agent_type: NetworkMonitorAgent
+team: blue
+description: Real-time network traffic monitoring and intrusion detection agent
+
+supported_tasks:
+  - monitor_traffic
+  - analyze_packets
+  - detect_intrusion
+
+tools:
+  - zeek
+  - suricata
+  - wireshark
+
+mitre_techniques:
+  - T1040  # Network Sniffing (detection)
+  - T1071  # Application Layer Protocol (detection)
+  - T1572  # Protocol Tunneling (detection)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/net-mon-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/net-mon-01-key.pem
+
+heartbeat_interval_seconds: 15
+task_timeout_seconds: 600

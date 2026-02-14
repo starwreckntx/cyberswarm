@@ -1,0 +1,142 @@
+
+# Full Swarm Scenario - All 14 Agents Active
+# Complete red/blue/purple team simulation with full attack chain,
+# defensive monitoring, incident response, and posture assessment
+
+name: Full Swarm Exercise
+description: >
+  Comprehensive cybersecurity simulation deploying all 14 agents across
+  red, blue, and purple teams. Exercises the complete attack lifecycle
+  from OSINT reconnaissance through exploitation, with concurrent
+  defensive monitoring, log analysis, containment, incident response,
+  threat hunting, and security posture assessment. AI monitoring
+  oversees all agent reasoning chains for integrity.
+target: 192.168.1.0/24
+duration: 900000  # 15 minutes
+
+initialTasks:
+  # === Phase 1: Reconnaissance & Baseline (Red + Blue) ===
+
+  # Blue Team: Establish monitoring baseline
+  - agentType: NetworkMonitorAgent
+    taskName: monitor_traffic
+    priority: 10
+    details:
+      phase: baseline
+      description: Establish network traffic baseline before offensive operations
+
+  # Blue Team: Start log collection
+  - agentType: LogAnalysisAgent
+    taskName: log_collection
+    priority: 10
+    details:
+      phase: baseline
+      sources: [syslog, windows-events, firewall, ids]
+
+  # Blue Team: AI monitoring of all agent reasoning
+  - agentType: AIMonitoringAgent
+    taskName: monitor_reasoning_chain
+    priority: 9
+    details:
+      phase: continuous
+      description: Monitor all agent AI reasoning chains for integrity
+
+  # Red Team: OSINT gathering
+  - agentType: OSINTAgent
+    taskName: osint_collection
+    priority: 9
+    details:
+      phase: reconnaissance
+      collection_type: domain_analysis
+
+  # Red Team: Network discovery
+  - agentType: DiscoveryAgent
+    taskName: network_scan
+    priority: 8
+    details:
+      phase: reconnaissance
+      scan_type: comprehensive
+
+  # === Phase 2: Assessment & Threat Intel (Purple) ===
+
+  # Purple Team: Initial posture assessment
+  - agentType: PostureAssessmentAgent
+    taskName: assess_posture
+    priority: 7
+    details:
+      phase: assessment
+      description: Baseline security posture before offensive operations
+
+  # Purple Team: Correlate existing threat intelligence
+  - agentType: ThreatIntelligenceAgent
+    taskName: correlate_iocs
+    priority: 7
+    details:
+      phase: intelligence
+      description: Cross-reference known IOCs with environment
+
+  # Purple Team: Proactive threat hunting
+  - agentType: ThreatHunterAgent
+    taskName: hunt_anomaly
+    priority: 7
+    details:
+      phase: hunting
+      description: Proactive anomaly hunting before red team operations
+
+  # === Cascading Rules Handle Remaining Phases ===
+  # Phase 3: Vulnerability Assessment → Exploitation (via Logic Pipe rules)
+  #   - Discovery results → VulnerabilityScanner scans
+  #   - OSINT data → enriches Discovery targeting
+  #   - High severity vulns → ExploitationAgent attempts
+
+  # Phase 4: Detection & Response (via Logic Pipe rules)
+  #   - Exploit success → ContainmentAgent isolates
+  #   - Intrusion detected → ContainmentAgent blocks
+  #   - Log anomalies → ThreatHunter investigates
+  #   - Hunt findings → IncidentResponse triages
+
+  # Phase 5: Adaptation & Learning (via Logic Pipe rules)
+  #   - Blue defense → Red adapts strategy
+  #   - Attack adaptation → ThreatIntel correlates
+  #   - Incident resolved → PostureAssessment evaluates
+
+parameters:
+  scanDepth: comprehensive
+  aggressiveness: high
+  stealthMode: false
+  focusDefense: true
+  enableAllAgents: true
+  enablePurpleTeam: true
+  enableOSINT: true
+  enableExploitation: true
+  enableLogAnalysis: true
+  enableContainment: true
+  enableAIMonitoring: true
+  mitreMappingEnabled: true
+  incidentResponseEnabled: true
+
+teams:
+  red:
+    enabled: true
+    agents: [DiscoveryAgent, OSINTAgent, VulnerabilityScannerAgent, ExploitationAgent, StrategyAdaptationAgent]
+    objectives:
+      - Enumerate attack surface via OSINT and network scanning
+      - Identify and exploit high-severity vulnerabilities
+      - Achieve lateral movement and escalate privileges
+      - Adapt strategy when detected by blue team
+  blue:
+    enabled: true
+    agents: [NetworkMonitorAgent, LogAnalysisAgent, PatchManagementAgent, ContainmentAgent, AIMonitoringAgent]
+    objectives:
+      - Monitor network traffic for anomalies
+      - Collect and analyze logs for indicators of compromise
+      - Contain and remediate threats as they are detected
+      - Monitor AI reasoning chains for integrity
+  purple:
+    enabled: true
+    agents: [ThreatHunterAgent, IncidentResponseAgent, PostureAssessmentAgent, ThreatIntelligenceAgent]
+    objectives:
+      - Proactively hunt for threats using hypothesis-driven investigation
+      - Respond to incidents through full IR lifecycle
+      - Assess security posture and identify coverage gaps
+      - Correlate threat intelligence and map to MITRE ATT&CK

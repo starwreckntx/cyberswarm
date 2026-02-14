@@ -1,0 +1,40 @@
+# Threat Hunter Agent Manifest - Purple Team
+agent_id: threat-hunter-01
+agent_name: Threat Hunter Agent
+agent_type: ThreatHunterAgent
+team: purple
+description: Proactive threat hunting agent using hypothesis-driven investigation, IOC correlation, and TTP analysis
+
+supported_tasks:
+  - hunt_ioc
+  - hunt_ttp
+  - hunt_anomaly
+  - validate_detection
+
+tools:
+  - yara
+  - sigma
+  - elastic-siem
+  - osquery
+  - zeek
+  - suricata
+  - atomic-red-team
+  - caldera
+
+mitre_techniques:
+  - T1059  # Command and Scripting Interpreter (hunting)
+  - T1055  # Process Injection (hunting)
+  - T1071  # Application Layer Protocol (hunting)
+  - T1027  # Obfuscated Files or Information (hunting)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/threat-hunter-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/threat-hunter-01-key.pem
+
+heartbeat_interval_seconds: 20
+task_timeout_seconds: 300

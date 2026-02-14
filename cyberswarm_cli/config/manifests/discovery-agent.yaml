@@ -1,0 +1,35 @@
+# Discovery Agent Manifest - Red Team
+agent_id: discovery-01
+agent_name: Discovery Agent
+agent_type: DiscoveryAgent
+team: red
+description: Network reconnaissance and host discovery agent using active and passive scanning techniques
+
+supported_tasks:
+  - network_scan
+  - targeted_scan
+  - service_enumeration
+  - os_fingerprint
+
+tools:
+  - nmap
+  - masscan
+  - amass
+
+mitre_techniques:
+  - T1046  # Network Service Discovery
+  - T1595  # Active Scanning
+  - T1590  # Gather Victim Network Information
+  - T1018  # Remote System Discovery
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/discovery-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/discovery-01-key.pem
+
+heartbeat_interval_seconds: 30
+task_timeout_seconds: 120

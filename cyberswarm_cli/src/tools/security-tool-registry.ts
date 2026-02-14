@@ -47,11 +47,19 @@ export class SecurityToolRegistry {
    */
   getToolsForAgent(agentType: string): SecurityTool[] {
     const agentToolMap: Record<string, ToolCategory[]> = {
+      // Red Team
       DiscoveryAgent: ['reconnaissance'],
+      OSINTAgent: ['reconnaissance', 'threat_intelligence'],
       VulnerabilityScannerAgent: ['vulnerability_scanning'],
-      PatchManagementAgent: ['incident_response', 'defense_evasion'],
-      NetworkMonitorAgent: ['network_monitoring', 'detection_engineering'],
+      ExploitationAgent: ['exploitation', 'post_exploitation', 'payload_generation', 'credential_access'],
       StrategyAdaptationAgent: ['exploitation', 'post_exploitation', 'defense_evasion', 'lateral_movement'],
+      // Blue Team
+      NetworkMonitorAgent: ['network_monitoring', 'detection_engineering'],
+      LogAnalysisAgent: ['threat_hunting', 'network_monitoring', 'detection_engineering'],
+      PatchManagementAgent: ['incident_response', 'defense_evasion'],
+      ContainmentAgent: ['incident_response', 'network_monitoring'],
+      AIMonitoringAgent: ['detection_engineering', 'threat_hunting'],
+      // Purple Team
       ThreatHunterAgent: ['threat_hunting', 'forensics', 'detection_engineering', 'network_monitoring'],
       IncidentResponseAgent: ['incident_response', 'forensics', 'network_monitoring'],
       PostureAssessmentAgent: ['vulnerability_scanning', 'detection_engineering', 'network_monitoring'],

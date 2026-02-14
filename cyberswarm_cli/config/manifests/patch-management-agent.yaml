@@ -1,0 +1,30 @@
+# Patch Management Agent Manifest - Blue Team
+agent_id: patch-mgmt-01
+agent_name: Patch Management Agent
+agent_type: PatchManagementAgent
+team: blue
+description: Automated vulnerability remediation and patch management agent
+
+supported_tasks:
+  - remediate_vuln
+  - patch_system
+  - verify_patch
+
+tools:
+  - thehive
+  - grr
+
+mitre_techniques:
+  - T1190  # Exploit Public-Facing Application (remediation)
+
+c2_server:
+  host: localhost
+  port: 8443
+  protocol: https
+
+security:
+  client_cert_path: /etc/cyberswarm/certs/agents/patch-mgmt-01.pem
+  client_key_path: /etc/cyberswarm/certs/agents/patch-mgmt-01-key.pem
+
+heartbeat_interval_seconds: 30
+task_timeout_seconds: 300

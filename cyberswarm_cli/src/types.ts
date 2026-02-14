@@ -290,6 +290,120 @@ export interface MitreMapping {
   detection_status: "DETECTED" | "MISSED" | "PARTIAL";
 }
 
+// OSINT Data Payload
+export interface OSINTData {
+  target: string;
+  collection_type: "domain_analysis" | "employee_profiling" | "osint_collection" | "cert_log_analysis";
+  subdomains?: string[];
+  emails?: string[];
+  social_profiles?: string[];
+  exposed_credentials?: number;
+  public_documents?: string[];
+  infrastructure?: Record<string, any>;
+  risk_indicators?: string[];
+}
+
+// Exploitation Payload
+export interface ExploitResult {
+  exploit_id: string;
+  target_ip: string;
+  target_port: number;
+  vulnerability_used: string;
+  exploit_module: string;
+  payload_type: string;
+  access_level: "none" | "user" | "admin" | "system";
+  session_id?: string;
+  artifacts_created?: string[];
+  detection_risk: "low" | "medium" | "high";
+}
+
+// Containment Payload
+export interface ContainmentAction {
+  containment_id: string;
+  action_type: "network_isolate" | "process_terminate" | "block_ip_domain" | "disable_account";
+  target: string;
+  scope: string[];
+  success: boolean;
+  evidence_preserved: boolean;
+  side_effects?: string[];
+}
+
+// Log Analysis Payload
+export interface LogAnalysisResult {
+  analysis_id: string;
+  log_sources: string[];
+  events_analyzed: number;
+  anomalies_found: number;
+  correlated_events: Array<{
+    event_id: string;
+    source: string;
+    severity: Severity;
+    description: string;
+    timestamp: string;
+  }>;
+  patterns_detected: string[];
+  risk_assessment: string;
+}
+
+// AI Monitoring Payload
+export interface AIReasoningAlert {
+  alert_id: string;
+  monitored_component: string;
+  alert_type: "logic_loop" | "model_drift" | "adversarial_input" | "confidence_anomaly" | "prompt_injection";
+  description: string;
+  severity: Severity;
+  affected_decisions: string[];
+  recommended_action: string;
+}
+
+// Agent Manifest Types
+export interface AgentManifest {
+  agent_id: string;
+  agent_name: string;
+  agent_type: string;
+  team: "red" | "blue" | "purple";
+  supported_tasks: string[];
+  c2_server: {
+    host: string;
+    port: number;
+    protocol: string;
+  };
+  security: {
+    client_cert_path: string;
+    client_key_path: string;
+  };
+  heartbeat_interval_seconds: number;
+  task_timeout_seconds: number;
+}
+
+// MCP Server Config Types
+export interface MCPServerConfig {
+  server: {
+    agent_listener: { host: string; port: number; protocol: string };
+    security: {
+      mTLS_enabled: boolean;
+      ca_cert_path: string;
+      server_cert_path: string;
+      server_key_path: string;
+      crl_path: string;
+    };
+  };
+  knowledge_base: {
+    type: string;
+    host: string;
+    port: number;
+    credentials_secret_name: string;
+  };
+  logic_pipe: {
+    tempo_control: {
+      red_team_max_tasks_per_minute: number;
+      target_cooldown_seconds: number;
+    };
+    high_impact_confidence_threshold: number;
+  };
+  api_endpoints: Record<string, string>;
+}
+
 // Cybersecurity Event Payloads
 export interface ReconData {
   target_ip: string;
@@ -334,11 +448,19 @@ export interface AttackAdaptation {
 
 // Agent Types Enum
 export enum AgentType {
+  // Red Team
   DISCOVERY = "DiscoveryAgent",
+  OSINT = "OSINTAgent",
   VULNERABILITY_SCANNER = "VulnerabilityScannerAgent",
-  PATCH_MANAGEMENT = "PatchManagementAgent",
-  NETWORK_MONITOR = "NetworkMonitorAgent",
+  EXPLOITATION = "ExploitationAgent",
   STRATEGY_ADAPTATION = "StrategyAdaptationAgent",
+  // Blue Team
+  NETWORK_MONITOR = "NetworkMonitorAgent",
+  LOG_ANALYSIS = "LogAnalysisAgent",
+  PATCH_MANAGEMENT = "PatchManagementAgent",
+  CONTAINMENT = "ContainmentAgent",
+  AI_MONITORING = "AIMonitoringAgent",
+  // Purple Team
   THREAT_HUNTER = "ThreatHunterAgent",
   INCIDENT_RESPONSE = "IncidentResponseAgent",
   POSTURE_ASSESSMENT = "PostureAssessmentAgent",
@@ -359,6 +481,19 @@ export enum EventType {
   MONITORING_COMPLETE = "MONITORING_COMPLETE",
   DEFENSE_ANALYSIS_COMPLETE = "DEFENSE_ANALYSIS_COMPLETE",
   TASK_ERROR = "TASK_ERROR",
+  // Extended Red Team Events
+  OSINT_DATA_COLLECTED = "OSINT_DATA_COLLECTED",
+  ACCESS_GAINED = "ACCESS_GAINED",
+  DATA_EXFILTRATED = "DATA_EXFILTRATED",
+  EXPLOIT_FAILED = "EXPLOIT_FAILED",
+  PAYLOAD_DELIVERED = "PAYLOAD_DELIVERED",
+  // Extended Blue Team Events
+  LOG_ANOMALY_DETECTED = "LOG_ANOMALY_DETECTED",
+  CONTAINMENT_ACTION = "CONTAINMENT_ACTION",
+  SYSTEM_ISOLATED = "SYSTEM_ISOLATED",
+  PROCESS_TERMINATED = "PROCESS_TERMINATED",
+  AI_REASONING_ALERT = "AI_REASONING_ALERT",
+  THREAT_HUNT_RESULT = "THREAT_HUNT_RESULT",
   // Purple Team Events
   THREAT_HUNT_FINDING = "THREAT_HUNT_FINDING",
   THREAT_HUNT_COMPLETE = "THREAT_HUNT_COMPLETE",
@@ -378,6 +513,13 @@ export enum LogicPipeRule {
   RED_DISCOVERS_BLUE_REACTS = "RED_DISCOVERS_BLUE_REACTS",
   BLUE_DETECTS_RED_ADAPTS = "BLUE_DETECTS_RED_ADAPTS",
   BLUE_DEFENDS_RED_REEVALUATES = "BLUE_DEFENDS_RED_REEVALUATES",
+  // Extended Rules
+  OSINT_ENRICHES_DISCOVERY = "OSINT_ENRICHES_DISCOVERY",
+  VULN_TRIGGERS_EXPLOIT = "VULN_TRIGGERS_EXPLOIT",
+  EXPLOIT_TRIGGERS_CONTAINMENT = "EXPLOIT_TRIGGERS_CONTAINMENT",
+  LOG_ANOMALY_TRIGGERS_HUNT = "LOG_ANOMALY_TRIGGERS_HUNT",
+  INTRUSION_TRIGGERS_CONTAINMENT = "INTRUSION_TRIGGERS_CONTAINMENT",
+  AI_MONITORS_REASONING = "AI_MONITORS_REASONING",
   // Purple Team Rules
   PURPLE_HUNT_ON_INTRUSION = "PURPLE_HUNT_ON_INTRUSION",
   PURPLE_INCIDENT_ON_HUNT_FINDING = "PURPLE_INCIDENT_ON_HUNT_FINDING",
