@@ -1,0 +1,40 @@
+{
+  "name": "cyberswarm",
+  "description": "AI-Powered Multi-Agent Cybersecurity Simulation Platform",
+  "version": "1.0.0",
+  "agent_config": {
+    "default_model": "kimi",
+    "default_temperature": 0.3,
+    "max_concurrent_agents": 19,
+    "teams": {
+      "red": {
+        "agent_count": 7,
+        "port_range": "9100-9106",
+        "definition": "agents/red-team.md"
+      },
+      "blue": {
+        "agent_count": 7,
+        "port_range": "9200-9206",
+        "definition": "agents/blue-team.md"
+      },
+      "purple": {
+        "agent_count": 5,
+        "port_range": "9300-9304",
+        "definition": "agents/purple-team.md"
+      }
+    }
+  },
+  "security": {
+    "rules_of_engagement": {
+      "allowed_networks": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+      "audit_logging": true,
+      "kill_switch_required": true
+    }
+  },
+  "integration": {
+    "logic_pipe_rules": 18,
+    "event_driven": true,
+    "self_healing": true,
+    "mitre_attack_coverage": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "cyberswarm",
+  "description": "AI-Powered Multi-Agent Cybersecurity Simulation Platform",
+  "version": "1.0.0",
+  "agent_config": {
+    "agents_directory": "agents/",
+    "max_concurrent_agents": 19,
+    "teams": {
+      "red": {
+        "agent_count": 7,
+        "agents": [
+          "discovery-agent",
+          "osint-agent",
+          "recon-agent",
+          "vulnerability-scanner-agent",
+          "exploitation-agent",
+          "persistence-agent",
+          "strategy-adaptation-agent"
+        ]
+      },
+      "blue": {
+        "agent_count": 7,
+        "agents": [
+          "network-monitor-agent",
+          "log-analysis-agent",
+          "patch-management-agent",
+          "containment-agent",
+          "forensics-agent",
+          "recovery-agent",
+          "ai-monitoring-agent"
+        ]
+      },
+      "purple": {
+        "agent_count": 5,
+        "agents": [
+          "threat-hunter-agent",
+          "incident-response-agent",
+          "posture-assessment-agent",
+          "threat-intelligence-agent",
+          "adaptation-agent"
+        ]
+      }
+    }
+  },
+  "security": {
+    "allowed_networks": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+    "audit_logging": true,
+    "rules_of_engagement": true
+  }
+}

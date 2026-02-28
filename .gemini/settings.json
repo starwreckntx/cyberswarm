@@ -1,0 +1,54 @@
+{
+  "experimental": {
+    "enableAgents": true,
+    "codebaseInvestigatorSettings": {
+      "enabled": true,
+      "maxNumTurns": 25,
+      "model": "gemini-2.5-pro"
+    }
+  },
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "run_shell_command|write_file|replace",
+        "hooks": [
+          {
+            "name": "cyberswarm-security-gate",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/security-gate.sh",
+            "timeout": 10000,
+            "description": "Validates tool calls against CyberSwarm security policy before execution"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "run_shell_command",
+        "hooks": [
+          {
+            "name": "cyberswarm-audit-log",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/audit-log.sh",
+            "timeout": 5000,
+            "description": "Logs all tool executions to the CyberSwarm audit trail"
+          }
+        ]
+      }
+    ],
+    "BeforeAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "cyberswarm-context-inject",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/context-inject.sh",
+            "timeout": 5000,
+            "description": "Injects current swarm state and threat context before each agent turn"
+          }
+        ]
+      }
+    ]
+  }
+}
