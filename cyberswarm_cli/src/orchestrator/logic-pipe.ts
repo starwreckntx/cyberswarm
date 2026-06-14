@@ -4,6 +4,7 @@
 import { CyberEvent, Task, EventType, LogicPipeRule, LogicPipeExecution } from '../types.js';
 import { logger } from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
+import { governTaskCreation } from '../governance/index.js';
 
 export class LogicPipe {
   private onTaskCreatedCallback?: (task: Task) => void;
@@ -173,6 +174,18 @@ export class LogicPipe {
         const tasks = await this.applySwarmAnomalyTriggersHeal(event);
         createdTasks.push(...tasks);
       }
+
+      // Governance (Layer 2): drop control transfers the source agent may not legally make.
+      // Opt-in via GOVERNANCE_ENABLED; a transparent no-op otherwise.
+      const governed = createdTasks.filter(t => {
+        const decision = governTaskCreation(event.eventType, t.agentType);
+        if (!decision.allowed) {
+          logger.warn(`[governance] blocked control transfer ${event.eventType} -> ${t.agentType}: ${decision.reason}`);
+        }
+        return decision.allowed;
+      });
+      createdTasks.length = 0;
+      createdTasks.push(...governed);
 
       // Log execution
       const execution: LogicPipeExecution = {

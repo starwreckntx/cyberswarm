@@ -50,6 +50,11 @@ export interface ToolExecution {
   output?: any;
   agentId: string;
   taskId?: string;
+  // Governance annotations (populated only when GOVERNANCE_ENABLED; see src/governance).
+  governed?: boolean;
+  governanceAllowed?: boolean;
+  governanceDeniedStage?: string | null;
+  governanceDenialReason?: string | null;
 }
 
 export interface ToolResult {

@@ -4,6 +4,7 @@ import { Agent, Task, CyberEvent, ChainOfThought, AgentStatus, SecurityTool, Too
 import { GeminiClient } from '../gemini/gemini-client.js';
 import { SecurityToolRegistry, getToolRegistry } from '../tools/security-tool-registry.js';
 import { logger } from '../utils/logger.js';
+import { governanceEnabled, governedToolCall } from '../governance/index.js';
 
 export abstract class BaseAgent {
   protected agentId: string;
@@ -226,6 +227,21 @@ export abstract class BaseAgent {
       agentId: this.agentId,
       taskId,
     };
+
+    // Governance (Layer 2 role gate + Layer 1 tool pipeline). Opt-in via GOVERNANCE_ENABLED;
+    // a transparent no-op otherwise. The agentType is the integrity-layer role. A denial is
+    // recorded as data on the execution (and on the tamper-evident audit chains) — the
+    // simulated action proceeds annotated, so the agent can reason over the refusal.
+    if (governanceEnabled()) {
+      const decision = governedToolCall(this.agentType, toolId, target, options, undefined, taskId);
+      execution.governed = true;
+      execution.governanceAllowed = decision.allowed;
+      execution.governanceDeniedStage = decision.deniedStage;
+      execution.governanceDenialReason = decision.denialReason;
+      if (!decision.allowed) {
+        logger.warn(`[governance] tool call denied [${this.agentId}] ${toolId} @ ${decision.deniedStage}: ${decision.denialReason}`);
+      }
+    }
 
     this.toolExecutionLog.push(execution);
 
