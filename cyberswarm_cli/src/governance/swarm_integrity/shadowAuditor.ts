@@ -310,6 +310,13 @@ export class ShadowAuditor {
       `${agent.role} is entitled to and currently holds ${capability}`,
       ALGO_CAPABILITY_OWNERSHIP,
     );
+    // A successful capability assertion is real work between handoffs — it breaks any
+    // handoff run, so reset the runaway-loop counters. Without this, _handoffRun (a global
+    // consecutive-handoff counter) and per-pair _bounces only ever grow and would
+    // eventually strip legitimate agents in a long-running simulation. Pure back-and-forth
+    // handoffs with no intervening work still trip the bound (see AV-008).
+    this._handoffRun = 0;
+    this._bounces.clear();
     return new IntegrityVerdict(
       VERDICT_ALLOW,
       agentId,

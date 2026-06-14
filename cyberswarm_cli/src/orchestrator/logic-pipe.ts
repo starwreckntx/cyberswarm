@@ -175,14 +175,16 @@ export class LogicPipe {
         createdTasks.push(...tasks);
       }
 
-      // Governance (Layer 2): drop control transfers the source agent may not legally make.
+      // Governance (Layer 2): re-route control transfers the source agent may not legally
+      // make to the safe fallback coordinator (fail-closed-with-fallback, not silent drop).
       // Opt-in via GOVERNANCE_ENABLED; a transparent no-op otherwise.
-      const governed = createdTasks.filter(t => {
+      const governed = createdTasks.map(t => {
         const decision = governTaskCreation(event.eventType, t.agentType);
         if (!decision.allowed) {
-          logger.warn(`[governance] blocked control transfer ${event.eventType} -> ${t.agentType}: ${decision.reason}`);
+          logger.warn(`[governance] re-routed blocked transfer ${event.eventType} -> ${t.agentType} to fallback ${decision.route}: ${decision.reason}`);
+          return { ...t, agentType: decision.route };
         }
-        return decision.allowed;
+        return t;
       });
       createdTasks.length = 0;
       createdTasks.push(...governed);

@@ -25,6 +25,10 @@ function ipv4ToInt(ip: string): number | null {
   let acc = 0;
   for (const p of parts) {
     if (!/^\d{1,3}$/.test(p)) return null;
+    // Reject leading-zero octets: "010" is decimal 10 to Number() but octal 8 to many OS
+    // resolvers, so allowing it would let "010.0.0.1" pass the RFC1918 check while the tool
+    // targets 8.0.0.1 (a public IP). Octal-IP confusion / scope bypass.
+    if (p.length > 1 && p.startsWith("0")) return null;
     const n = Number(p);
     if (n < 0 || n > 255) return null;
     acc = acc * 256 + n;
@@ -36,7 +40,7 @@ function inCidr(ipInt: number, cidr: string): boolean {
   const [base, bitsStr] = cidr.split("/");
   const bits = Number(bitsStr);
   const baseInt = ipv4ToInt(base);
-  if (baseInt === null || Number.isNaN(bits)) return false;
+  if (baseInt === null || Number.isNaN(bits) || bits < 0 || bits > 32) return false;
   if (bits === 0) return true;
   const mask = bits === 32 ? 0xffffffff : (0xffffffff << (32 - bits)) >>> 0;
   return (ipInt & mask) === (baseInt & mask);

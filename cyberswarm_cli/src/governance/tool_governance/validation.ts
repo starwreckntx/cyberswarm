@@ -32,16 +32,35 @@ function scanField(name: string, value: unknown): ValidationResult | null {
   return null;
 }
 
-/** Validate the target and all option values for injection-class characters. */
+/** Recursively scan a value (string / array / nested object) for forbidden characters. */
+function scanValue(name: string, val: unknown): ValidationResult | null {
+  if (typeof val === "string") return scanField(name, val);
+  if (Array.isArray(val)) {
+    for (let i = 0; i < val.length; i++) {
+      const check = scanValue(`${name}[${i}]`, val[i]);
+      if (check) return check;
+    }
+  } else if (val !== null && typeof val === "object") {
+    for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
+      const check = scanValue(`${name}.${k}`, v);
+      if (check) return check;
+    }
+  }
+  // numbers / booleans / null / undefined cannot carry shell metacharacters.
+  return null;
+}
+
+/**
+ * Validate the target and all option values for injection-class characters. Options are
+ * scanned recursively so a payload nested in an array or sub-object (e.g.
+ * { custom_args: ["-p", "80; rm -rf /"] }) cannot bypass the gate.
+ */
 export function validateRequest(target: string | undefined, options: Record<string, unknown> = {}): ValidationResult {
   const targetCheck = scanField("target", target);
   if (targetCheck) return targetCheck;
   for (const [key, val] of Object.entries(options)) {
-    // Only string-ish option values can carry metacharacters; numbers/booleans are safe.
-    if (typeof val === "string") {
-      const check = scanField(`option:${key}`, val);
-      if (check) return check;
-    }
+    const check = scanValue(`option:${key}`, val);
+    if (check) return check;
   }
   return { valid: true, detail: "no forbidden characters" };
 }
