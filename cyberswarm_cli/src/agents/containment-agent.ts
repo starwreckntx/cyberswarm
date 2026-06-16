@@ -3,12 +3,12 @@
 
 import { BaseAgent } from './base-agent.js';
 import { Task, CyberEvent, ContainmentAction, EventType } from '../types.js';
-import { GeminiClient } from '../gemini/gemini-client.js';
+import { LLMClient } from '../llm/llm-client.js';
 import { PROMPTS } from '../gemini/prompts.js';
 import { logger } from '../utils/logger.js';
 
 export class ContainmentAgent extends BaseAgent {
-  constructor(geminiClient: GeminiClient) {
+  constructor(geminiClient: LLMClient) {
     super(
       'containment-01',
       'Threat Containment Agent',

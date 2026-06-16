@@ -5,16 +5,31 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'yaml';
 import dotenv from 'dotenv';
-import { Config } from '../types.js';
+import { Config, LLMProvider } from '../types.js';
 
 // Load environment variables
 dotenv.config();
 
+const kimiApiKey = process.env.KIMI_API_KEY || process.env.MOONSHOT_API_KEY || '';
+
+// Provider defaults to whatever is explicitly requested via LLM_PROVIDER,
+// otherwise falls back to Kimi when a Kimi/Moonshot key is present, else Gemini.
+const defaultProvider: LLMProvider =
+  (process.env.LLM_PROVIDER as LLMProvider) || (kimiApiKey ? 'kimi' : 'gemini');
+
 // Default configuration
 const defaultConfig: Config = {
+  provider: defaultProvider,
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
     model: 'gemini-1.5-pro',
+    temperature: 0.7,
+    maxOutputTokens: 8192,
+  },
+  kimi: {
+    apiKey: kimiApiKey,
+    model: process.env.KIMI_MODEL || 'kimi-k2-0711-preview',
+    baseUrl: process.env.KIMI_BASE_URL || process.env.MOONSHOT_BASE_URL || 'https://api.moonshot.ai/v1',
     temperature: 0.7,
     maxOutputTokens: 8192,
   },
@@ -56,8 +71,12 @@ export function loadConfig(configPath?: string): Config {
     config = mergeConfig(config, fileConfig);
   }
 
-  // Validate required fields
-  if (!config.gemini.apiKey) {
+  // Validate the API key for the selected provider only.
+  if (config.provider === 'kimi') {
+    if (!config.kimi.apiKey) {
+      throw new Error('KIMI_API_KEY (or MOONSHOT_API_KEY) is required when provider is "kimi". Set it in .env or a config file.');
+    }
+  } else if (!config.gemini.apiKey) {
     throw new Error('GEMINI_API_KEY is required. Set it in .env file or config file.');
   }
 
@@ -69,7 +88,9 @@ export function loadConfig(configPath?: string): Config {
  */
 function mergeConfig(base: Config, override: Partial<Config>): Config {
   return {
+    provider: override.provider || base.provider,
     gemini: { ...base.gemini, ...override.gemini },
+    kimi: { ...base.kimi, ...override.kimi },
     simulation: { ...base.simulation, ...override.simulation },
     logging: { ...base.logging, ...override.logging },
     output: { ...base.output, ...override.output },

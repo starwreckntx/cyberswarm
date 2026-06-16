@@ -1,7 +1,7 @@
-// Base Agent Class - Common functionality for all swarm agents with Gemini integration
+// Base Agent Class - Common functionality for all swarm agents with LLM integration
 
 import { Agent, Task, CyberEvent, ChainOfThought, AgentStatus, SecurityTool, ToolExecution } from '../types.js';
-import { GeminiClient } from '../gemini/gemini-client.js';
+import { LLMClient } from '../llm/llm-client.js';
 import { SecurityToolRegistry, getToolRegistry } from '../tools/security-tool-registry.js';
 import { logger } from '../utils/logger.js';
 
@@ -11,7 +11,7 @@ export abstract class BaseAgent {
   protected agentType: string;
   protected supportedTasks: string[];
   protected status: AgentStatus = "IDLE";
-  protected geminiClient: GeminiClient;
+  protected geminiClient: LLMClient;
   protected toolRegistry: SecurityToolRegistry;
   protected toolExecutionLog: ToolExecution[] = [];
   protected onEventCallback?: (event: CyberEvent) => void;
@@ -23,7 +23,7 @@ export abstract class BaseAgent {
     agentName: string,
     agentType: string,
     supportedTasks: string[],
-    geminiClient: GeminiClient
+    geminiClient: LLMClient
   ) {
     this.agentId = agentId;
     this.agentName = agentName;

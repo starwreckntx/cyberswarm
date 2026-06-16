@@ -1,9 +1,22 @@
 
 # CyberSwarm CLI Default Configuration
 
+# LLM backend agents reason with: "gemini" or "kimi".
+# If unset, the CLI auto-selects "kimi" when KIMI_API_KEY/MOONSHOT_API_KEY is
+# present, otherwise "gemini". Override with the LLM_PROVIDER env var.
+provider: ${LLM_PROVIDER}
+
 gemini:
   apiKey: ${GEMINI_API_KEY}
   model: gemini-1.5-pro
+  temperature: 0.7
+  maxOutputTokens: 8192
+
+# Kimi (Moonshot AI) — OpenAI-compatible Chat Completions API.
+kimi:
+  apiKey: ${KIMI_API_KEY}
+  model: kimi-k2-0711-preview
+  baseUrl: https://api.moonshot.ai/v1   # use https://api.moonshot.cn/v1 for the China endpoint
   temperature: 0.7
   maxOutputTokens: 8192
 

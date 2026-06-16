@@ -312,20 +312,30 @@ program
       const config = loadConfig(options.config);
       spinner.succeed('Configuration is valid');
 
+      const activeModel =
+        config.provider === 'kimi' ? config.kimi.model : config.gemini.model;
+
       console.log('');
       console.log(formatSectionHeader('Configuration Details'));
-      console.log(`${chalk.bold('Gemini Model:')} ${config.gemini.model}`);
+      console.log(`${chalk.bold('LLM Provider:')} ${config.provider}`);
+      console.log(`${chalk.bold('Model:')} ${activeModel}`);
+      if (config.provider === 'kimi') {
+        console.log(`${chalk.bold('Kimi Base URL:')} ${config.kimi.baseUrl}`);
+      }
       console.log(`${chalk.bold('Target Network:')} ${config.simulation.targetNetwork}`);
       console.log(`${chalk.bold('Timeout:')} ${config.simulation.timeout / 1000}s`);
       console.log(`${chalk.bold('Max Agents:')} ${config.simulation.maxConcurrentAgents}`);
       console.log(`${chalk.bold('Log Level:')} ${config.logging.level}`);
       console.log('');
 
-      // Test Gemini API key
-      if (config.gemini.apiKey) {
-        console.log(formatSuccess('Gemini API key is set'));
+      // Test the API key for the active provider
+      const apiKeySet =
+        config.provider === 'kimi' ? !!config.kimi.apiKey : !!config.gemini.apiKey;
+      const keyLabel = config.provider === 'kimi' ? 'Kimi (Moonshot) API key' : 'Gemini API key';
+      if (apiKeySet) {
+        console.log(formatSuccess(`${keyLabel} is set`));
       } else {
-        console.log(formatError('Gemini API key is missing'));
+        console.log(formatError(`${keyLabel} is missing`));
       }
 
       // Check CVE database

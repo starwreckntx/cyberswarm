@@ -663,10 +663,21 @@ export enum LogicPipeRule {
 }
 
 // Configuration Types
+export type LLMProvider = "gemini" | "kimi";
+
 export interface Config {
+  // Which LLM backend agents reason with. Defaults to "gemini".
+  provider: LLMProvider;
   gemini: {
     apiKey: string;
     model: string;
+    temperature: number;
+    maxOutputTokens: number;
+  };
+  kimi: {
+    apiKey: string;
+    model: string;
+    baseUrl: string;
     temperature: number;
     maxOutputTokens: number;
   };
