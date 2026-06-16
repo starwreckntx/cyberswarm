@@ -10,7 +10,7 @@ The repository ships **two independent runtimes** that share the same domain mod
 
 | Component | Path | Stack | Role |
 |-----------|------|-------|------|
-| **CyberSwarm CLI** | `cyberswarm_cli/` | TypeScript / Node.js (ESM) + Google Gemini | Headless simulation engine. Full 19-agent swarm, all Logic Pipe rules, security tool registry, knowledge bases. This is the canonical implementation. |
+| **CyberSwarm CLI** | `cyberswarm_cli/` | TypeScript / Node.js (ESM), pluggable LLM (Google Gemini **or** Moonshot Kimi) | Headless simulation engine. Full 19-agent swarm, all Logic Pipe rules, security tool registry, knowledge bases. This is the canonical implementation. |
 | **CyberSwarm Dashboard** | `app/` | Next.js 14 / React 18 / Prisma (Postgres) | Real-time web UI for monitoring & controlling a simulation. Ships its own self-contained orchestrator with a **subset** of agents (mock/deterministic, no Gemini calls) and SSE streaming. |
 
 > The two runtimes are **not** wired together — `app/` does not import from `cyberswarm_cli/`.
@@ -28,6 +28,7 @@ The repository ships **two independent runtimes** that share the same domain mod
 │   │   ├── types.ts             # All shared types, AgentType/EventType/LogicPipeRule enums
 │   │   ├── agents/              # base-agent.ts + 19 agent implementations
 │   │   ├── orchestrator/        # cybersecurity-orchestrator, agent-manager, logic-pipe
+│   │   ├── llm/                 # llm-client.ts (provider interface), kimi-client.ts, index.ts (factory)
 │   │   ├── gemini/              # gemini-client.ts (Google Generative AI), prompts.ts
 │   │   ├── tools/               # security-tool-registry.ts (30+ tools, MITRE-mapped)
 │   │   ├── output/              # console-formatter.ts (chalk/cli-table3/boxen)
@@ -126,8 +127,11 @@ Event names live in the `EventType` enum (`types.ts`). When adding a rule, add t
 ```bash
 cd cyberswarm_cli
 npm install
-echo "GEMINI_API_KEY=<your-key>" > .env   # config reads ${GEMINI_API_KEY} from env/.env
-npm run build                   # tsc → dist/
+# Pick a provider via its API key. Provider auto-selects: Kimi if a Kimi/Moonshot
+# key is present, else Gemini. Override explicitly with LLM_PROVIDER=kimi|gemini.
+echo "KIMI_API_KEY=<your-key>" > .env     # Moonshot Kimi (OpenAI-compatible)
+# echo "GEMINI_API_KEY=<your-key>" > .env # or Google Gemini
+npm run build                   # tsc → dist/ (tsconfig.json drives ESM/ES2022 output)
 npm run cyberswarm -- validate  # check config + API key
 npm run cyberswarm -- scenarios # list config/scenarios/*.yaml
 npm run cyberswarm -- start --target 192.168.1.0/24 --duration 30
@@ -165,6 +169,11 @@ yarn lint                       # next lint / eslint
   - `emitEvent(eventType, payload, severity?, target?, taskId?)`
   - `getGeminiDecision<T>(prompt)` / `getGeminiDecisionWithFiles<T>(prompt, fileUris)`
   - `getAvailableTools()` / `getToolContextForPrompt()` / `logToolUsage(...)`
+- **LLM is provider-agnostic.** Agents reason through the `LLMClient` interface
+  (`src/llm/llm-client.ts`); `createLLMClient(config)` (`src/llm/index.ts`) returns a
+  `GeminiClient` or `KimiClient` based on `config.provider`. The `getGeminiDecision*`
+  helper names are historical — they call whichever provider is configured. Add new
+  providers by implementing `LLMClient` and extending the factory + config.
 - **Tools never run for real.** The `SecurityToolRegistry` and agent tool calls are *simulated*
   and logged for the chain-of-thought; nothing executes against the network.
 - **Tool ↔ agent mapping** is by `ToolCategory` in `getToolsForAgent()` — add new tools with
