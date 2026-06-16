@@ -54,6 +54,10 @@ logs/
 *.log
 .logs/
 
+# CyberSwarm CLI simulation run artifacts
+cyberswarm_cli/output/exports/
+cyberswarm_cli/output/reports/
+
 # Abacus
 .abacus.donotdelete
 
