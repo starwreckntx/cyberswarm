@@ -680,6 +680,7 @@ export interface Config {
     baseUrl: string;
     temperature: number;
     maxOutputTokens: number;
+    userAgent: string;
   };
   simulation: {
     targetNetwork: string;

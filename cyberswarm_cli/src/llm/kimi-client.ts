@@ -14,10 +14,14 @@ export interface KimiClientOptions {
   baseUrl?: string;
   temperature?: number;
   maxOutputTokens?: number;
+  userAgent?: string;
 }
 
 const DEFAULT_MODEL = 'kimi-k2-0711-preview';
 const DEFAULT_BASE_URL = 'https://api.moonshot.ai/v1';
+// Kimi For Coding (kimi.com/code) only serves recognised coding-agent clients,
+// so default to such an identity; override with KIMI_USER_AGENT as needed.
+const DEFAULT_USER_AGENT = 'Kilo-Code/1.0.0';
 
 export class KimiClient implements LLMClient {
   private apiKey: string;
@@ -25,6 +29,7 @@ export class KimiClient implements LLMClient {
   private baseUrl: string;
   private temperature: number;
   private maxOutputTokens: number;
+  private userAgent: string;
 
   constructor(options: KimiClientOptions) {
     this.apiKey = options.apiKey;
@@ -33,6 +38,7 @@ export class KimiClient implements LLMClient {
     this.baseUrl = (options.baseUrl || DEFAULT_BASE_URL).replace(/\/$/, '');
     this.temperature = options.temperature ?? 0.7;
     this.maxOutputTokens = options.maxOutputTokens ?? 8192;
+    this.userAgent = options.userAgent || DEFAULT_USER_AGENT;
 
     logger.info(`Kimi client initialized with model: ${this.model} (${this.baseUrl})`);
   }
@@ -106,6 +112,11 @@ export class KimiClient implements LLMClient {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.apiKey}`,
+          // Identifies the client. Some Kimi tiers (e.g. "Kimi For Coding" via
+          // kimi.com/code) only serve recognised coding-agent clients; set
+          // KIMI_USER_AGENT accordingly. For general programmatic use, prefer
+          // an Open Platform key (platform.moonshot.ai / platform.kimi.ai).
+          'User-Agent': this.userAgent,
         },
         body: JSON.stringify({
           model: this.model,

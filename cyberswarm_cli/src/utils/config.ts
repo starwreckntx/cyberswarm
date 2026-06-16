@@ -30,8 +30,10 @@ const defaultConfig: Config = {
     apiKey: kimiApiKey,
     model: process.env.KIMI_MODEL || 'kimi-k2-0711-preview',
     baseUrl: process.env.KIMI_BASE_URL || process.env.MOONSHOT_BASE_URL || 'https://api.moonshot.ai/v1',
-    temperature: 0.7,
+    // Some Kimi models (e.g. kimi-for-coding) require temperature=1; override via KIMI_TEMPERATURE.
+    temperature: parseFloat(process.env.KIMI_TEMPERATURE || '0.7'),
     maxOutputTokens: 8192,
+    userAgent: process.env.KIMI_USER_AGENT || 'Kilo-Code/1.0.0',
   },
   simulation: {
     targetNetwork: process.env.DEFAULT_TARGET_NETWORK || '192.168.1.0/24',

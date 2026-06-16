@@ -24,6 +24,7 @@ export function createLLMClient(config: Config): LLMClient {
       baseUrl: config.kimi.baseUrl,
       temperature: config.kimi.temperature,
       maxOutputTokens: config.kimi.maxOutputTokens,
+      userAgent: config.kimi.userAgent,
     });
   }
 
