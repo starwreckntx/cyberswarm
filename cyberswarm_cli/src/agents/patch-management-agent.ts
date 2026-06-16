@@ -3,12 +3,12 @@
 
 import { BaseAgent } from './base-agent.js';
 import { Task, CyberEvent, DefenseAction, EventType } from '../types.js';
-import { GeminiClient } from '../gemini/gemini-client.js';
+import { LLMClient } from '../llm/llm-client.js';
 import { PROMPTS } from '../gemini/prompts.js';
 import { logger } from '../utils/logger.js';
 
 export class PatchManagementAgent extends BaseAgent {
-  constructor(geminiClient: GeminiClient) {
+  constructor(geminiClient: LLMClient) {
     super(
       'patch-mgmt-01',
       'Patch Management Agent',

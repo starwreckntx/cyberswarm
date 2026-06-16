@@ -3,6 +3,7 @@
 
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
+import { LLMClient } from '../llm/llm-client.js';
 
 export interface GeminiResponse {
   text: string;
@@ -15,7 +16,7 @@ export interface GeminiFileUpload {
   name: string;
 }
 
-export class GeminiClient {
+export class GeminiClient implements LLMClient {
   private genAI: GoogleGenerativeAI;
   private model: GenerativeModel;
   private apiKey: string;

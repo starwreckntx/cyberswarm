@@ -2,7 +2,7 @@
 
 import { AgentManager } from './agent-manager.js';
 import { LogicPipe } from './logic-pipe.js';
-import { GeminiClient } from '../gemini/gemini-client.js';
+import { createLLMClient, LLMClient } from '../llm/index.js';
 import { DiscoveryAgent } from '../agents/discovery-agent.js';
 import { VulnerabilityScannerAgent } from '../agents/vulnerability-scanner-agent.js';
 import { PatchManagementAgent } from '../agents/patch-management-agent.js';
@@ -29,7 +29,7 @@ import { Config } from '../types.js';
 export class CyberSecurityOrchestrator {
   private agentManager: AgentManager;
   private logicPipe: LogicPipe;
-  private geminiClient: GeminiClient;
+  private geminiClient: LLMClient;
   private config: Config;
 
   private isRunning: boolean = false;
@@ -44,10 +44,7 @@ export class CyberSecurityOrchestrator {
 
   constructor(config: Config) {
     this.config = config;
-    this.geminiClient = new GeminiClient(
-      config.gemini.apiKey,
-      config.gemini.model
-    );
+    this.geminiClient = createLLMClient(config);
 
     this.agentManager = new AgentManager();
     this.logicPipe = new LogicPipe();

@@ -3,12 +3,12 @@
 
 import { BaseAgent } from './base-agent.js';
 import { Task, CyberEvent, PostureAssessment, PostureGap, EventType } from '../types.js';
-import { GeminiClient } from '../gemini/gemini-client.js';
+import { LLMClient } from '../llm/llm-client.js';
 import { PROMPTS } from '../gemini/prompts.js';
 import { logger } from '../utils/logger.js';
 
 export class PostureAssessmentAgent extends BaseAgent {
-  constructor(geminiClient: GeminiClient) {
+  constructor(geminiClient: LLMClient) {
     super(
       'posture-assess-01',
       'Security Posture Assessment Agent',
