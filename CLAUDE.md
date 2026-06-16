@@ -161,7 +161,7 @@ yarn lint                       # next lint / eslint
 - **Agents** extend `BaseAgent` (`agents/base-agent.ts`) and implement
   `async executeTask(task): Promise<CyberEvent>`. Use the inherited helpers rather than
   re-implementing them:
-  - `logChainOfThought(step, type, description, reasoning, data?, confidence?, taskId?)`
+  - `logChainOfThought(stepNumber, stepType, description, reasoning, data?, confidence?, taskId?)`
   - `emitEvent(eventType, payload, severity?, target?, taskId?)`
   - `getGeminiDecision<T>(prompt)` / `getGeminiDecisionWithFiles<T>(prompt, fileUris)`
   - `getAvailableTools()` / `getToolContextForPrompt()` / `logToolUsage(...)`
