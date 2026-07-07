@@ -9,7 +9,11 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "cyberswarm": "tsx src/index.ts"
+    "cyberswarm": "tsx src/index.ts",
+    "gov:av": "tsx src/governance/validation/avMatrix.ts",
+    "gov:tool": "tsx src/governance/validation/toolGovSelftest.ts",
+    "gov:bundle": "tsx src/governance/validation/runValidation.ts",
+    "gov:verify": "tsx src/governance/validation/validateBundle.ts"
   },
   "bin": {
     "cyberswarm": "./dist/index.js"

@@ -79,3 +79,7 @@ prisma/dev.db-journal
 # Temporary files
 tmp/
 temp/
+
+# Governance evidence bundles
+governance_output/
+*-INTEGRITY-CLOSED.txt
