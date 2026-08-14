@@ -143,6 +143,28 @@ npm run cyberswarm -- report --input <results.json> --format markdown
 - There is **no test runner or linter configured** in the CLI package. Validate changes by
   building (`npm run build`) and running a short scenario.
 
+#### Kimi provider configuration (env vars, read by `utils/config.ts`)
+The Kimi client (`src/llm/kimi-client.ts`) is OpenAI-compatible and tunable entirely via env:
+
+| Var | Default | Notes |
+|-----|---------|-------|
+| `KIMI_API_KEY` / `MOONSHOT_API_KEY` | — | Selecting Kimi requires one of these. |
+| `KIMI_BASE_URL` / `MOONSHOT_BASE_URL` | `https://api.moonshot.ai/v1` | Endpoint base; `/chat/completions` is appended. |
+| `KIMI_MODEL` | `kimi-k2-0711-preview` | Model id. |
+| `KIMI_TEMPERATURE` | `0.7` | Some models pin this (e.g. `kimi-for-coding` **requires `1`**). |
+| `KIMI_USER_AGENT` | `Kilo-Code/1.0.0` | `User-Agent` header sent to the API. |
+
+Two Kimi backends exist and are **not** interchangeable — the key type dictates base URL:
+- **Open Platform** (platform.moonshot.ai / platform.kimi.ai) — general programmatic API. Use
+  the default base URL + a standard model. Preferred for automated/headless use.
+- **Kimi For Coding** (kimi.com/code) — a coding-plan tier. Set
+  `KIMI_BASE_URL=https://api.kimi.com/coding/v1`, `KIMI_MODEL=kimi-for-coding`,
+  `KIMI_TEMPERATURE=1`. This tier **gates access by client identity** (the `User-Agent`) and
+  only serves recognised coding-agent clients, which is why `KIMI_USER_AGENT` is configurable.
+- `kimi-for-coding` is a deep-reasoning model (~25–30s/call); use longer `--duration` (≥120s)
+  so multi-stage Logic Pipe cascades have time to complete.
+
+
 ### Dashboard (`app/`)
 ```bash
 cd app
